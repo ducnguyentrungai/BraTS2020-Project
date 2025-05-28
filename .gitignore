@@ -1,23 +1,37 @@
-# Ignore PNG files
+# Ignore PNG images
 *.png
 
-# Cache / temp files
+# Ignore logs, temp, and shell scripts
 *.log
 *.tmp
 *.bak
 *.swp
 *.sh
-# Jupyter notebook checkpoints
+*.json
+
+# Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
-# Python cache
+# Ignore Python cache
 __pycache__/
 *.pyc
 
-# VS Code
+# Ignore VS Code settings
 .vscode/
 
-# System files
+# Ignore system files (macOS & Windows)
 .DS_Store
 Thumbs.db
 
+# Ignore custom folders (adjust as needed)
+job_run/
+logs/
+
+# Model checkpoints (deep learning)
+*.h5
+*.pth
+*.ckpt
+
+# Data exports
+*.csv
+*.tsv
