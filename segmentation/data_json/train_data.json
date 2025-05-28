@@ -1,0 +1,1182 @@
+[
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_345.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_345.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_193.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_193.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_076.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_076.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_085.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_085.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_358.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_358.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_017.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_017.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_067.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_067.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_284.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_284.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_008.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_008.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_114.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_114.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_117.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_117.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_328.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_328.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_323.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_323.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_275.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_275.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_164.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_164.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_111.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_111.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_348.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_348.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_061.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_061.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_158.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_158.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_321.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_321.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_223.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_223.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_228.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_228.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_142.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_142.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_018.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_018.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_247.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_247.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_025.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_025.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_203.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_203.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_325.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_325.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_361.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_361.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_259.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_259.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_141.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_141.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_347.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_347.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_235.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_235.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_365.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_365.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_302.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_302.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_333.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_333.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_272.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_272.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_173.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_173.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_197.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_197.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_020.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_020.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_354.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_354.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_080.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_080.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_168.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_168.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_019.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_019.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_199.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_199.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_105.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_105.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_286.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_286.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_119.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_119.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_350.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_350.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_032.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_032.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_037.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_037.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_159.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_159.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_184.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_184.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_169.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_169.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_303.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_303.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_140.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_140.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_336.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_336.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_176.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_176.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_060.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_060.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_112.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_112.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_149.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_149.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_007.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_007.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_273.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_273.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_254.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_254.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_011.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_011.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_239.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_239.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_104.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_104.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_082.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_082.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_183.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_183.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_266.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_266.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_224.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_224.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_297.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_297.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_352.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_352.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_318.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_318.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_148.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_148.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_204.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_204.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_093.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_093.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_070.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_070.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_351.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_351.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_097.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_097.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_144.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_144.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_282.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_282.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_098.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_098.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_324.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_324.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_069.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_069.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_024.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_024.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_038.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_038.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_145.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_145.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_123.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_123.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_068.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_068.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_166.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_166.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_353.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_353.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_295.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_295.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_174.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_174.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_126.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_126.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_147.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_147.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_211.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_211.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_087.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_087.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_312.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_312.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_182.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_182.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_313.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_313.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_178.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_178.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_281.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_281.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_364.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_364.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_263.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_263.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_291.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_291.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_262.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_262.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_130.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_130.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_039.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_039.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_012.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_012.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_246.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_246.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_186.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_186.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_305.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_305.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_113.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_113.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_180.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_180.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_245.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_245.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_233.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_233.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_118.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_118.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_341.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_341.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_356.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_356.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_267.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_267.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_335.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_335.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_165.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_165.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_225.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_225.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_137.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_137.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_155.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_155.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_200.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_200.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_198.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_198.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_362.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_362.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_003.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_003.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_292.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_292.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_116.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_116.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_210.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_210.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_212.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_212.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_027.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_027.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_121.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_121.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_285.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_285.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_269.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_269.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_319.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_319.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_128.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_128.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_075.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_075.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_300.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_300.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_030.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_030.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_084.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_084.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_330.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_330.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_108.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_108.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_243.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_243.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_322.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_322.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_134.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_134.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_185.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_185.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_304.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_304.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_045.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_045.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_340.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_340.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_066.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_066.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_276.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_276.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_086.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_086.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_187.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_187.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_071.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_071.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_160.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_160.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_013.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_013.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_036.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_036.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_029.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_029.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_171.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_171.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_143.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_143.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_299.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_299.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_248.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_248.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_151.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_151.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_229.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_229.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_222.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_222.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_132.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_132.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_249.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_249.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_052.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_052.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_241.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_241.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_278.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_278.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_096.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_096.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_283.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_283.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_179.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_179.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_205.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_205.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_124.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_124.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_042.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_042.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_090.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_090.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_288.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_288.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_207.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_207.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_255.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_255.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_308.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_308.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_005.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_005.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_257.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_257.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_359.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_359.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_101.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_101.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_227.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_227.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_317.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_317.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_214.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_214.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_172.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_172.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_099.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_099.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_216.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_216.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_062.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_062.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_048.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_048.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_033.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_033.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_268.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_268.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_201.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_201.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_329.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_329.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_028.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_028.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_290.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_290.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_231.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_231.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_261.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_261.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_163.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_163.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_315.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_315.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_139.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_139.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_063.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_063.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_136.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_136.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_129.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_129.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_009.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_009.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_065.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_065.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_015.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_015.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_157.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_157.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_041.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_041.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_339.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_339.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_301.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_301.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_217.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_217.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_280.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_280.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_332.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_332.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_237.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_237.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_208.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_208.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_213.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_213.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_296.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_296.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_337.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_337.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_252.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_252.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_360.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_360.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_338.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_338.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_270.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_270.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_202.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_202.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_162.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_162.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_044.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_044.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_218.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_218.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_191.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_191.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_260.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_260.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_106.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_106.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_054.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_054.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_002.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_002.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_050.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_050.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_081.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_081.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_206.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_206.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_035.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_035.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_264.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_264.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_092.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_092.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_053.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_053.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_265.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_265.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_242.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_242.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_014.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_014.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_316.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_316.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_089.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_089.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_274.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_274.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_167.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_167.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_363.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_363.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_135.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_135.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_307.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_307.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_355.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_355.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_320.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_320.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_244.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_244.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_055.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_055.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_051.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_051.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_175.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_175.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_190.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_190.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_367.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_367.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_188.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_188.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_170.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_170.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_059.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_059.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_049.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_049.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_236.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_236.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_253.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_253.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_022.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_022.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_314.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_314.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_161.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_161.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_277.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_277.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_192.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_192.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_294.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_294.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_344.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_344.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_258.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_258.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_309.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_309.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_150.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_150.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_131.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_131.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_152.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_152.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_100.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_100.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_088.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_088.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_331.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_331.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_215.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_215.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_122.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_122.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_369.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_369.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_021.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_021.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_189.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_189.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_072.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_072.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_107.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_107.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_271.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_271.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_349.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_349.nii.gz"
+    },
+    {
+        "image": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr/image_103.nii.gz",
+        "label": "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr/label_103.nii.gz"
+    }
+]
