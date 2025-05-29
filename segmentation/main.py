@@ -177,7 +177,7 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
     for epoch in range(start_epoch, num_epochs):
         model.train()
         run_loss = run_iou = run_dice = run_sensi = run_speci = run_acc = 0.0
-        pbar = tqdm(train_loader, desc=f"Trainig - epoch [{epoch+1}/{num_epochs}]", colour="green")
+        pbar = tqdm(train_loader, desc=f"Trainig - epoch[{epoch+1}/{num_epochs}]", colour="green")
         for batch in pbar:
             optimizer.zero_grad()
             image = batch['image'].to(device).float()
@@ -210,24 +210,27 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
         avg_speci = run_speci / num_batches
         avg_acc = run_acc / num_batches
 
-        # === Ghi train log ===
+        # === Ghi log vào CSV ===
         with open(train_log_file, 'a', newline='') as f:
             csv.writer(f).writerow([epoch+1, avg_loss, avg_iou, avg_dice, avg_sensi, avg_speci, avg_acc])
 
-        print(tabulate([[f"{avg_loss:.4f}", f"{avg_iou:.4f}", f"{avg_dice:.4f}", f"{avg_sensi:.4f}", f"{avg_speci:.4f}", f"{avg_acc:.4f}"]],
-                       headers=["Loss", "IoU", "Dice", "Sensitivity", "Specificity", "Accuracy"],
-                       tablefmt="fancy_grid"))
-
-        # === Evaluate on validation ===
+        # === Evaluate on validation set ===
         val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc = Evaluate_Model(
             model, val_loader, loss_fn, device)
 
         with open(val_log_file, 'a', newline='') as f:
             csv.writer(f).writerow([epoch+1, val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc])
 
-        print(tabulate([[val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc]],
-                       headers=["Val_Loss", "Val_IoU", "Val_Dice", "Val_Sens", "Val_Spec", "Val_Acc"],
-                       tablefmt="fancy_grid"))
+        # === In bảng gộp Train/Val (2 dòng) ===
+        headers = ["Set", "Loss", "IoU", "Dice", "Sensitivity", "Specificity", "Accuracy"]
+        rows = [
+            ["Train", f"{avg_loss:.4f}", f"{avg_iou:.4f}", f"{avg_dice:.4f}",
+             f"{avg_sensi:.4f}", f"{avg_speci:.4f}", f"{avg_acc:.4f}"],
+            
+            ["Val", f"{val_loss:.4f}", f"{val_iou:.4f}", f"{val_dice:.4f}",
+             f"{val_sensi:.4f}", f"{val_speci:.4f}", f"{val_acc:.4f}"]
+        ]
+        print(tabulate(rows, headers=headers, tablefmt="fancy_grid"))
 
         # === Lưu mô hình tốt nhất theo Dice ===
         if val_dice > best_dice:
@@ -299,7 +302,7 @@ if __name__ == "__main__":
         train_loader=train_loader,
         val_loader=test_loader,
         num_classes=4,
-        num_epochs=100,
+        num_epochs=300,
         resume_train=False,
         device=device
     )
