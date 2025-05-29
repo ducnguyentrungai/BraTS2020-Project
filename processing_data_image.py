@@ -89,7 +89,7 @@ def prepare_data(root_path, out_path, images_stack: list, dim: int, scales: bool
                     hw_crop[0]:hw_crop[1],
                     d_crop[0]:d_crop[1]
                 ]
-                label[label == 4] = 3
+            label[label == 4] = 3
             nib.save(nib.Nifti1Image(label, affine=flair_affine),
                      os.path.join(labels_path, f"label_{patient_id}.nii.gz"))
                 

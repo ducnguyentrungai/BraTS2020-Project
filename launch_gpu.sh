@@ -1,8 +1,8 @@
 #!/bin/bash
 
 srun --pty \
-    --job-name=bratsJob \
-    --partition=dgx-small\
+    --job-name=brats-seg \
+    --partition=dgx-small  \
     --account=ddt_acc23 \
-    --time=12:00:00 \
+    --time=24:00:00 \
     /bin/bash

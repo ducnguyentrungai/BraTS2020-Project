@@ -1,9 +1,9 @@
 import torch
 from monai.transforms import Compose, LoadImaged, EnsureChannelFirstd, Spacingd, Orientationd, ScaleIntensityd,Resized, CastToTyped, ToTensord
-from monai.data import CacheDataset, DataLoader
+from monai.data import CacheDataset, Dataset, DataLoader
 from monai.networks.nets import UNETR
 from monai.networks.nets import SwinUNETR
-from monai.losses import DiceFocalLoss, DiceLoss
+from monai.losses import DiceFocalLoss, DiceLoss, DiceCELoss
 from monai.metrics import DiceMetric
 from monai.utils import set_determinism, first
 from tqdm import tqdm
@@ -21,6 +21,11 @@ import time
 from tabulate import tabulate
 from metrics import Metric
 from evaluate import Evaluate_Model
+from pynvml import *
+import pytorch_lightning as pl
+from torch.optim import Adam
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 
 def extract_dict_data(image_paths:str, label_paths:str):
@@ -146,6 +151,134 @@ def resume_training(model, optimizer, checkpoint_path, device='cpu'):
     print(f"Resumed from epoch {checkpoint['epoch'] + 1}")
     return model, optimizer, checkpoint['epoch'] + 1
 
+
+# def auto_select_gpus(n=2, threshold_mem_mb=1000, threshold_util=10):
+#     """
+#     Trả về n GPU rảnh nhất (RAM & load thấp), dùng cho DDP hoặc multi-GPU.
+#     """
+#     try:
+#         nvmlInit()
+#         device_count = nvmlDeviceGetCount()
+#         gpus = []
+
+#         for i in range(device_count):
+#             handle = nvmlDeviceGetHandleByIndex(i)
+#             mem_info = nvmlDeviceGetMemoryInfo(handle)
+#             util_info = nvmlDeviceGetUtilizationRates(handle)
+
+#             mem_used_mb = mem_info.used // 1024**2
+#             gpu_util = util_info.gpu
+
+#             print(f"GPU {i}: Used {mem_used_mb}MB, Util {gpu_util}%")
+
+#             if mem_used_mb < threshold_mem_mb and gpu_util < threshold_util:
+#                 gpus.append((i, mem_used_mb, gpu_util))
+
+#         if not gpus:
+#             print("⚠️ No suitable GPU found. Using default CUDA_VISIBLE_DEVICES.")
+#             return
+
+#         # Sort and pick top n
+#         gpus.sort(key=lambda x: (x[1], x[2]))  # sort by (mem, util)
+#         selected_ids = [str(g[0]) for g in gpus[:n]]
+#         os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(selected_ids)
+#         print(f"✅ Auto-selected GPUs: {selected_ids}")
+
+#     except Exception as e:
+#         print(f"⚠️ GPU auto-selection failed: {e}")
+#     finally:
+#         try:
+#             nvmlShutdown()
+#         except:
+#             pass
+
+def auto_select_gpu():
+    """
+    Luôn chọn GPU có RAM dùng ít nhất và tải thấp nhất, không phụ thuộc ngưỡng.
+    """
+    try:
+        nvmlInit()
+        device_count = nvmlDeviceGetCount()
+        gpus = []
+
+        for i in range(device_count):
+            handle = nvmlDeviceGetHandleByIndex(i)
+            mem_info = nvmlDeviceGetMemoryInfo(handle)
+            util_info = nvmlDeviceGetUtilizationRates(handle)
+
+            mem_used_mb = mem_info.used // 1024**2
+            gpu_util = util_info.gpu
+
+            print(f"GPU {i}: Used {mem_used_mb}MB, Utilization {gpu_util}%")
+
+            gpus.append((i, mem_used_mb, gpu_util))
+
+        if gpus:
+            # Sắp xếp theo RAM và util, ưu tiên GPU ít dùng nhất
+            gpus.sort(key=lambda x: (x[1], x[2]))
+            selected = gpus[0][0]
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(selected)
+            print(f"✅ Auto-selected GPU: {selected}")
+        else:
+            print("⚠️ No GPUs found. Using default GPU.")
+
+    except Exception as e:
+        print(f"⚠️ GPU auto-selection failed: {e}")
+
+    finally:
+        try:
+            nvmlShutdown()
+        except:
+            pass
+
+
+class SegModule(pl.LightningModule):
+    def __init__(self, model, num_classes, lr=1e-3):
+        super().__init__()
+        self.model = model
+        self.lr = lr
+        self.loss_fn = DiceCELoss(to_onehot_y=True, softmax=True, include_background=False)
+        self.metric = Metric(num_classes=num_classes, ignore_index=0)
+
+    def forward(self, x):
+        return self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        x = batch['image']
+        y = batch['label']
+        y_hat = self(x)
+        loss = self.loss_fn(y_hat, y)
+
+        iou = self.metric.IoU(y_hat, y)
+        dice = self.metric.Dice(y_hat, y)
+
+        self.log_dict({
+            'train/loss': loss,
+            'train/iou': iou,
+            'train/dice': dice,
+        }, prog_bar=True)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x = batch['image']
+        y = batch['label']
+        y_hat = self(x)
+        loss = self.loss_fn(y_hat, y)
+
+        iou = self.metric.IoU(y_hat, y)
+        dice = self.metric.Dice(y_hat, y)
+
+        self.log_dict({
+            'val/loss': loss,
+            'val/iou': iou,
+            'val/dice': dice,
+        }, prog_bar=True)
+        return loss
+
+    def configure_optimizers(self):
+        return Adam(self.model.parameters(), lr=self.lr)
+
+
 def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: DataLoader,
              num_classes: int, num_epochs: int, resume_train: bool = False, device='cuda'):
     
@@ -164,7 +297,7 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
     with open(val_log_file, 'w', newline='') as f:
         csv.writer(f).writerow(['Epoch', 'Val_Loss', 'Val_IoU', 'Val_Dice', 'Val_Sensitivity', 'Val_Specificity', 'Val_Accuracy'])
 
-    metric = Metric(num_classes=num_classes)
+    metric = Metric(num_classes=num_classes, ignore_index=0)
     best_dice = 0.3
     start_time = time.time()
 
@@ -252,7 +385,10 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
     h, m, s = elapsed // 3600, (elapsed % 3600) // 60, elapsed % 60
     print(f"Training time: {h}h {m}m {s}s")
 
+
+
 if __name__ == "__main__":
+    
     
     # image_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
     # label_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"
@@ -271,14 +407,14 @@ if __name__ == "__main__":
     train_transform = transform_for_train()
     test_transform = transform_for_test()
     
-    train_dataset = CacheDataset(train_data, transform=train_transform)
+    train_dataset = Dataset(train_data, transform=train_transform)
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=2, drop_last=True)
-    test_dataset = CacheDataset(test_data, transform=test_transform)
+    test_dataset = Dataset(test_data, transform=test_transform)
     test_loader = DataLoader(test_dataset, batch_size=8, num_workers=2)
 
-
+    auto_select_gpu()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+
     model = UNETR(
         in_channels=4,
         out_channels=4,
@@ -291,9 +427,15 @@ if __name__ == "__main__":
         res_block=True
     ).to(device)
 
-    loss_seg = DiceLoss(include_background=True, to_onehot_y=True, softmax=True)
+    loss_seg = DiceCELoss(
+    include_background=False,
+    to_onehot_y=True,
+    softmax=True,
+    lambda_dice=1.0,
+    lambda_ce=0.3
+    )   
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-6)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6)
 
     training(
         model=model,

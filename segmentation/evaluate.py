@@ -27,9 +27,9 @@ def Evaluate_Model(model, data_loader, loss_fn, device, selected_classes:list=[]
             total_acc   += metric.Accuracy(outputs, labels, selected_classes)
 
             pbar.set_postfix({
-                'Loss': f'{loss.item():.3f}',
-                'Dice': f'{metric.Dice(outputs, labels, selected_classes):.3f}',
-                'IoU': f'{metric.IoU(outputs, labels, selected_classes):.3f}'
+                'Loss': f'{loss.item():.3f}',           
+                'IoU': f'{metric.IoU(outputs, labels, selected_classes):.3f}',
+                'Dice': f'{metric.Dice(outputs, labels, selected_classes):.3f}'
             })
 
     # Trung bình kết quả
