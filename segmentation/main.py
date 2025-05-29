@@ -232,55 +232,56 @@ def auto_select_gpu():
             pass
 
 
-class SegModule(pl.LightningModule):
-    def __init__(self, model, num_classes, lr=1e-3):
-        super().__init__()
-        self.model = model
-        self.lr = lr
-        self.loss_fn = DiceCELoss(to_onehot_y=True, softmax=True, include_background=False)
-        self.metric = Metric(num_classes=num_classes, ignore_index=0)
+# class SegModule(pl.LightningModule):
+#     def __init__(self, model, num_classes, lr=1e-3):
+#         super().__init__()
+#         self.model = model
+#         self.lr = lr
+#         self.loss_fn = DiceCELoss(to_onehot_y=True, softmax=True, include_background=False)
+#         self.metric = Metric(num_classes=num_classes, ignore_index=0)
 
-    def forward(self, x):
-        return self.model(x)
+#     def forward(self, x):
+#         return self.model(x)
 
-    def training_step(self, batch, batch_idx):
-        x = batch['image']
-        y = batch['label']
-        y_hat = self(x)
-        loss = self.loss_fn(y_hat, y)
+#     def training_step(self, batch, batch_idx):
+#         x = batch['image']
+#         y = batch['label']
+#         y_hat = self(x)
+#         loss = self.loss_fn(y_hat, y)
 
-        iou = self.metric.IoU(y_hat, y)
-        dice = self.metric.Dice(y_hat, y)
+#         iou = self.metric.IoU(y_hat, y)
+#         dice = self.metric.Dice(y_hat, y)
 
-        self.log_dict({
-            'train/loss': loss,
-            'train/iou': iou,
-            'train/dice': dice,
-        }, prog_bar=True)
-        return loss
+#         self.log_dict({
+#             'train/loss': loss,
+#             'train/iou': iou,
+#             'train/dice': dice,
+#         }, prog_bar=True)
+#         return loss
 
-    def validation_step(self, batch, batch_idx):
-        x = batch['image']
-        y = batch['label']
-        y_hat = self(x)
-        loss = self.loss_fn(y_hat, y)
+#     def validation_step(self, batch, batch_idx):
+#         x = batch['image']
+#         y = batch['label']
+#         y_hat = self(x)
+#         loss = self.loss_fn(y_hat, y)
 
-        iou = self.metric.IoU(y_hat, y)
-        dice = self.metric.Dice(y_hat, y)
+#         iou = self.metric.IoU(y_hat, y)
+#         dice = self.metric.Dice(y_hat, y)
 
-        self.log_dict({
-            'val/loss': loss,
-            'val/iou': iou,
-            'val/dice': dice,
-        }, prog_bar=True)
-        return loss
+#         self.log_dict({
+#             'val/loss': loss,
+#             'val/iou': iou,
+#             'val/dice': dice,
+#         }, prog_bar=True)
+#         return loss
 
-    def configure_optimizers(self):
-        return Adam(self.model.parameters(), lr=self.lr)
+#     def configure_optimizers(self):
+#         return Adam(self.model.parameters(), lr=self.lr)
 
 
 def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: DataLoader,
-             num_classes: int, num_epochs: int, resume_train: bool = False, device='cuda'):
+             num_classes: int, num_epochs: int, include_background: bool = True, 
+             resume_train: bool = False, device='cuda'):
     
     # === Tạo thư mục log mới giống YOLO ===
     logs_path = get_new_log_dir()
@@ -297,7 +298,7 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
     with open(val_log_file, 'w', newline='') as f:
         csv.writer(f).writerow(['Epoch', 'Val_Loss', 'Val_IoU', 'Val_Dice', 'Val_Sensitivity', 'Val_Specificity', 'Val_Accuracy'])
 
-    metric = Metric(num_classes=num_classes, ignore_index=0)
+    metric = Metric(num_classes=num_classes, include_background=include_background)
     best_dice = 0.3
     start_time = time.time()
 
@@ -349,7 +350,7 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
 
         # === Evaluate on validation set ===
         val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc = Evaluate_Model(
-            model, val_loader, loss_fn, device)
+            model, num_classes, val_loader, loss_fn, device, include_background=False)
 
         with open(val_log_file, 'a', newline='') as f:
             csv.writer(f).writerow([epoch+1, val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc])
@@ -409,6 +410,7 @@ if __name__ == "__main__":
     
     train_dataset = Dataset(train_data, transform=train_transform)
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=2, drop_last=True)
+    
     test_dataset = Dataset(test_data, transform=test_transform)
     test_loader = DataLoader(test_dataset, batch_size=8, num_workers=2)
 
@@ -427,15 +429,24 @@ if __name__ == "__main__":
         res_block=True
     ).to(device)
 
+    # loss_seg = DiceLoss(
+    # include_background=False,
+    # to_onehot_y=True,
+    # softmax=True,
+    # ) 
+    
     loss_seg = DiceCELoss(
-    include_background=False,
+    include_background=True,
     to_onehot_y=True,
     softmax=True,
     lambda_dice=1.0,
-    lambda_ce=0.3
+    lambda_ce=0.5
     )   
     
+    # train_2 1.0 - 0.3
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     training(
         model=model,
@@ -444,7 +455,8 @@ if __name__ == "__main__":
         train_loader=train_loader,
         val_loader=test_loader,
         num_classes=4,
-        num_epochs=300,
+        num_epochs=100,
+        include_background=False,
         resume_train=False,
         device=device
     )
