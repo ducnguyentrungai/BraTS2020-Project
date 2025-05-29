@@ -13,24 +13,23 @@ def Evaluate_Model(model, data_loader, loss_fn, device, selected_classes:list=[]
         pbar = tqdm(data_loader, desc='Evaluating', colour='blue')
         for batch in pbar:
             images = batch['image'].to(device).float()          # [B, C, D, H, W]
-            labels = batch['mask'].to(device).long()            # [B, D, H, W]
+            labels = batch['label'].to(device).long()            # [B, D, H, W]
 
             outputs = model(images)                             # [B, C, D, H, W]
             loss = loss_fn(outputs, labels)
             total_loss += loss.item()
+            
 
-            preds = torch.argmax(outputs, dim=1)                # [B, D, H, W]
-
-            total_iou   += metric.IoU(preds, labels, selected_classes)
-            total_dice  += metric.Dice(preds, labels, selected_classes)
-            total_sensi += metric.Sensitivity(preds, labels, selected_classes)
-            total_speci += metric.Specificity(preds, labels, selected_classes)
-            total_acc   += metric.Accuracy(preds, labels, selected_classes)
+            total_iou   += metric.IoU(outputs, labels, selected_classes)
+            total_dice  += metric.Dice(outputs, labels, selected_classes)
+            total_sensi += metric.Sensitivity(outputs, labels, selected_classes)
+            total_speci += metric.Specificity(outputs, labels, selected_classes)
+            total_acc   += metric.Accuracy(outputs, labels, selected_classes)
 
             pbar.set_postfix({
                 'Loss': f'{loss.item():.3f}',
-                'Dice': f'{metric.Dice(preds, labels, selected_classes):.3f}',
-                'IoU': f'{metric.IoU(preds, labels, selected_classes):.3f}'
+                'Dice': f'{metric.Dice(outputs, labels, selected_classes):.3f}',
+                'IoU': f'{metric.IoU(outputs, labels, selected_classes):.3f}'
             })
 
     # Trung bình kết quả

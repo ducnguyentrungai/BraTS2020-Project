@@ -55,7 +55,7 @@ def read_data(name_file: str):
     """
     with open(name_file, 'r') as f:
         data = json.load(f)
-    print(f"Loaded {name_file} done.")
+    print(f"Loaded '{name_file}' done.")
     return data
 
 def transform_for_train():
@@ -177,8 +177,7 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
     for epoch in range(start_epoch, num_epochs):
         model.train()
         run_loss = run_iou = run_dice = run_sensi = run_speci = run_acc = 0.0
-        pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}", colour="green")
-
+        pbar = tqdm(train_loader, desc=f"Trainig - epoch [{epoch+1}/{num_epochs}]", colour="green")
         for batch in pbar:
             optimizer.zero_grad()
             image = batch['image'].to(device).float()
@@ -189,18 +188,18 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
             loss_value.backward()
             optimizer.step()
 
-            pred = torch.argmax(output, dim=1)
+            # pred = torch.argmax(output, dim=1)
             run_loss += loss_value.item()
-            run_iou += metric.IoU(pred, label).item()
-            run_dice += metric.Dice(pred, label).item()
-            run_sensi += metric.Sensitivity(pred, label).item()
-            run_speci += metric.Specificity(pred, label).item()
-            run_acc += metric.Accuracy(pred, label).item()
+            run_iou += metric.IoU(output, label)
+            run_dice += metric.Dice(output, label)
+            run_sensi += metric.Sensitivity(output, label)
+            run_speci += metric.Specificity(output, label)
+            run_acc += metric.Accuracy(output, label)
 
             pbar.set_postfix({
-                "loss": f"{loss_value.item():.3f}",
-                "iou": f"{run_iou:.3f}",
-                "dice": f"{run_dice:.3f}",
+                "Loss": f"{loss_value.item():.3f}",
+                "Iou": f"{metric.IoU(output, label):.3f}",
+                "Dice": f"{metric.Dice(output, label):.3f}",
             })
 
         num_batches = len(train_loader)
