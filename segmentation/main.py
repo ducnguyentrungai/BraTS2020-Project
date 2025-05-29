@@ -20,6 +20,7 @@ import csv
 import time
 from tabulate import tabulate
 from metrics import Metric
+from evaluate import Evaluate_Model
 
 
 def extract_dict_data(image_paths:str, label_paths:str):
@@ -40,7 +41,7 @@ def write_data(name_file: str, data: list):
     """
     with open(name_file, 'w') as f:
         json.dump(data, f, indent=4)
-    print(f"Đã lưu {name_file}")
+    print(f"Saved {name_file} done.")
     
 def read_data(name_file: str):
     """
@@ -54,7 +55,7 @@ def read_data(name_file: str):
     """
     with open(name_file, 'r') as f:
         data = json.load(f)
-    print(f"Đã load {name_file}")
+    print(f"Loaded {name_file} done.")
     return data
 
 def transform_for_train():
@@ -92,198 +93,175 @@ def save_image_comparison(image, label, pred, slice_idx=69, save_path="compariso
         slice_idx (int): Slice index in depth dimension to visualize.
         save_path (str): Path to save the image comparison.
     """
-    # Convert tensors to numpy
-    if torch.is_tensor(image): image = image.detach().cpu().numpy()
-    if torch.is_tensor(label): label = label.detach().cpu().numpy()
-    if torch.is_tensor(pred):  pred = pred.detach().cpu().numpy()
+    def process(vol):
+            if vol.ndim == 5: return vol[0, 0]
+            if vol.ndim == 4: return vol[0]
+            if vol.ndim == 3: return vol
+            raise ValueError(f"Invalid shape: {vol.shape}")
 
-    # Process image
-    if image.ndim == 5:  # (B, C, D, H, W)
-        image = image[0, 0]  # Take first batch, first channel -> (D, H, W)
-    elif image.ndim == 4:  # (B, D, H, W)
-        image = image[0]     # Take first batch
-    elif image.ndim != 3:
-        raise ValueError(f"Unsupported image shape: {image.shape}")
+    image = process(image)
+    label = process(label)
+    pred = process(pred)
 
-    # Process label
-    if label.ndim == 5:  # (B, 1, D, H, W)
-        label = label[0, 0]
-    elif label.ndim == 4:  # (B, D, H, W)
-        label = label[0]
-    elif label.ndim != 3:
-        raise ValueError(f"Unsupported label shape: {label.shape}")
-
-    # Process pred
-    if pred.ndim == 5:  # (B, 1, D, H, W)
-        pred = pred[0, 0]
-    elif pred.ndim == 4:  # (B, D, H, W)
-        pred = pred[0]
-    elif pred.ndim != 3:
-        raise ValueError(f"Unsupported pred shape: {pred.shape}")
-
-
-    # Safety check on slice index
     if slice_idx < 0 or slice_idx >= image.shape[0]:
         raise IndexError(f"slice_idx {slice_idx} is out of range for image depth {image.shape[0]}")
 
-    # Extract the slice
-    img_slice = image[:, :, slice_idx]   # (H, W)
-    label_slice = label[:, :,slice_idx]
-    pred_slice = pred[:, :, slice_idx]
+    img_slice = image[slice_idx, :, :]
+    label_slice = label[slice_idx, :, :]
+    pred_slice = pred[slice_idx, :, :]
 
-    # Plot and save
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-
-    axes[0].imshow(img_slice, cmap='gray')
-    axes[0].set_title("Original Image")
-    axes[0].axis('off')
-
-    axes[1].imshow(label_slice, cmap='viridis')
-    axes[1].set_title("Ground Truth")
-    axes[1].axis('off')
-
-    axes[2].imshow(pred_slice, cmap='viridis')
-    axes[2].set_title("Prediction")
-    axes[2].axis('off')
-
+    titles = ["Original Image", "Ground Truth", "Prediction"]
+    for ax, slc, title in zip(axes, [img_slice, label_slice, pred_slice], titles):
+        ax.imshow(slc, cmap='gray' if title == "Original Image" else 'viridis')
+        ax.set_title(title)
+        ax.axis('off')
     plt.tight_layout()
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    os.makedirs(os.path.dirname(save_path) or '.', exist_ok=True)
     plt.savefig(save_path, bbox_inches='tight')
     plt.close()
 
 
-def resume_training(model, optimizer, logs_path, name_pth:str, device):
-    """
-    Resume training from last checkpoint saved as 'last_model.pth'.
+def get_new_log_dir(base='logs'):
+    os.makedirs(base, exist_ok=True)
+    i = 1
+    while True:
+        path = os.path.join(base, f'train_{i}')
+        if not os.path.exists(path):
+            os.makedirs(path)
+            return path
+        i += 1
 
-    Returns:
-        model: model with loaded weights
-        optimizer: optimizer with loaded state
-        start_epoch (int): epoch to continue training from
-    """
-    checkpoint_path = os.path.join(logs_path, name_pth)
+def resume_training(model, optimizer, checkpoint_path, device='cpu'):
     if not os.path.exists(checkpoint_path):
         print("Checkpoint not found, starting from scratch.")
-        return model.to(device), optimizer, 0  # start from epoch 0
+        return model.to(device), optimizer, 0
 
     print(f"Loading checkpoint from {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path, map_location=device)
-
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    start_epoch = checkpoint['epoch'] + 1
-
     model.to(device)
-    model.train()  # VERY IMPORTANT to continue training mode
-    print(f"Resumed from epoch {start_epoch}")
-    return model, optimizer, start_epoch
+    model.train()
+    print(f"Resumed from epoch {checkpoint['epoch'] + 1}")
+    return model, optimizer, checkpoint['epoch'] + 1
 
+def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: DataLoader,
+             num_classes: int, num_epochs: int, resume_train: bool = False, device='cuda'):
+    
+    # === Tạo thư mục log mới giống YOLO ===
+    logs_path = get_new_log_dir()
+    train_log_file = os.path.join(logs_path, 'train_logs.csv')
+    val_log_file = os.path.join(logs_path, 'val_logs.csv')
+    best_model_path = os.path.join(logs_path, 'best_model.pth')
+    last_model_path = os.path.join(logs_path, 'last_model.pth')
 
-def training(model, loss_fn, optimization, dataloader: DataLoader, num_epochs: int, lr: float, batch_size: int, alpha: float, resume_train: bool = False, device='cpu'):
-    logs_path = 'logs'
-    os.makedirs(logs_path, exist_ok=True)
+    # Ghi header train log
+    with open(train_log_file, 'w', newline='') as f:
+        csv.writer(f).writerow(['Epoch', 'Loss', 'IoU', 'Dice', 'Sensitivity', 'Specificity', 'Accuracy'])
 
-    file_path = os.path.join(logs_path, 'train_logs.csv')
-    with open(file_path, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['Epoch', 'Loss', 'Iou', 'Dice', 'Sensitivity', 'Specificity', 'Accuracy'])
+    # Ghi header val log
+    with open(val_log_file, 'w', newline='') as f:
+        csv.writer(f).writerow(['Epoch', 'Val_Loss', 'Val_IoU', 'Val_Dice', 'Val_Sensitivity', 'Val_Specificity', 'Val_Accuracy'])
 
-    optimizer = optimization
-    metric = Metric(num_classes=4)
-    num_batchs = len(dataloader)
+    metric = Metric(num_classes=num_classes)
     best_dice = 0.3
     start_time = time.time()
 
+    model.to(device)
     if resume_train:
-        model, optimizer, start_epoch = resume_training(model, optimizer, logs_path, device=device)
+        model, optimizer, start_epoch = resume_training(model, optimizer, last_model_path, device=device)
     else:
         start_epoch = 0
 
     for epoch in range(start_epoch, num_epochs):
         model.train()
         run_loss = run_iou = run_dice = run_sensi = run_speci = run_acc = 0.0
+        pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}", colour="green")
 
-        pbar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{num_epochs}", colour="green")
         for batch in pbar:
             optimizer.zero_grad()
-            image = batch['image'].to(device)
-            label = batch['label'].to(device)
+            image = batch['image'].to(device).float()
+            label = batch['label'].to(device).long()
 
             output = model(image)
             loss_value = loss_fn(output, label)
-
             loss_value.backward()
             optimizer.step()
 
+            pred = torch.argmax(output, dim=1)
             run_loss += loss_value.item()
-            iou = metric.IoU(output, label)
-            dice = metric.Dice(output, label)
-            sensi = metric.Sensitivity(output, label)
-            speci = metric.Specificity(output, label)
-            acc = metric.Accuracy(output, label)
-
-            run_iou += iou
-            run_dice += dice
-            run_sensi += sensi
-            run_speci += speci
-            run_acc += acc
+            run_iou += metric.IoU(pred, label).item()
+            run_dice += metric.Dice(pred, label).item()
+            run_sensi += metric.Sensitivity(pred, label).item()
+            run_speci += metric.Specificity(pred, label).item()
+            run_acc += metric.Accuracy(pred, label).item()
 
             pbar.set_postfix({
                 "loss": f"{loss_value.item():.3f}",
-                "iou": f"{iou:.3f}",
-                "dice": f"{dice:.3f}",
+                "iou": f"{run_iou:.3f}",
+                "dice": f"{run_dice:.3f}",
             })
 
-        avg_run_loss = run_loss / num_batchs
-        avg_run_iou = run_iou / num_batchs
-        avg_run_dice = run_dice / num_batchs
-        avg_run_sensi = run_sensi / num_batchs
-        avg_run_speci = run_speci / num_batchs
-        avg_run_acc = run_acc / num_batchs
+        num_batches = len(train_loader)
+        avg_loss = run_loss / num_batches
+        avg_iou = run_iou / num_batches
+        avg_dice = run_dice / num_batches
+        avg_sensi = run_sensi / num_batches
+        avg_speci = run_speci / num_batches
+        avg_acc = run_acc / num_batches
 
-        with open(file_path, 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([epoch + 1, avg_run_loss, avg_run_iou, avg_run_dice, avg_run_sensi, avg_run_speci, avg_run_acc])
+        # === Ghi train log ===
+        with open(train_log_file, 'a', newline='') as f:
+            csv.writer(f).writerow([epoch+1, avg_loss, avg_iou, avg_dice, avg_sensi, avg_speci, avg_acc])
 
-        header = ["Loss", "IoU", "Dice", "Sensitivity", "Specificity", "Accuracy"]
-        values = [[f"{avg_run_loss:.4f}", f"{avg_run_iou:.4f}", f"{avg_run_dice:.4f}", f"{avg_run_sensi:.4f}", f"{avg_run_speci:.4f}", f"{avg_run_acc:.4f}"]]
-        print(tabulate(values, header, tablefmt="fancy_grid"), "\n")
+        print(tabulate([[f"{avg_loss:.4f}", f"{avg_iou:.4f}", f"{avg_dice:.4f}", f"{avg_sensi:.4f}", f"{avg_speci:.4f}", f"{avg_acc:.4f}"]],
+                       headers=["Loss", "IoU", "Dice", "Sensitivity", "Specificity", "Accuracy"],
+                       tablefmt="fancy_grid"))
 
-        if resume_train:
-            if avg_run_dice > best_dice:
-                best_dice = avg_run_dice
-                resume_training(model, optimizer, logs_path)
-                torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict()
-                }, os.path.join(logs_path, 'best_model.pth'))
+        # === Evaluate on validation ===
+        val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc = Evaluate_Model(
+            model, val_loader, loss_fn, device)
 
-            # Always save the last model
+        with open(val_log_file, 'a', newline='') as f:
+            csv.writer(f).writerow([epoch+1, val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc])
+
+        print(tabulate([[val_loss, val_iou, val_dice, val_sensi, val_speci, val_acc]],
+                       headers=["Val_Loss", "Val_IoU", "Val_Dice", "Val_Sens", "Val_Spec", "Val_Acc"],
+                       tablefmt="fancy_grid"))
+
+        # === Lưu mô hình tốt nhất theo Dice ===
+        if val_dice > best_dice:
+            best_dice = val_dice
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict()
-            }, os.path.join(logs_path, 'last_model.pth'))
+            }, best_model_path)
 
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    hours, rem = divmod(elapsed_time, 3600)
-    minutes, seconds = divmod(rem, 60)
-    print(f"Training time: {int(hours)}h {int(minutes)}m {int(seconds)}s")
+        # === Luôn lưu mô hình cuối ===
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict()
+        }, last_model_path)
 
-
+    elapsed = int(time.time() - start_time)
+    h, m, s = elapsed // 3600, (elapsed % 3600) // 60, elapsed % 60
+    print(f"Training time: {h}h {m}m {s}s")
 
 if __name__ == "__main__":
-    image_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
-    label_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"
-    dictionary_data = extract_dict_data(image_paths, label_paths)
+    
+    # image_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
+    # label_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"
+    # dictionary_data = extract_dict_data(image_paths, label_paths)
     
     # # Chia 80% train và 20% test
     # train_data, test_data = train_test_split(dictionary_data, test_size=0.2, random_state=42)
     # write_data('train_data.json', train_data)
     # write_data('test_data.json', test_data)
     
+     
     # Đọc lại
     train_data = read_data('data_json/train_data.json')
     test_data = read_data('data_json/test_data.json')
@@ -295,14 +273,36 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=2, drop_last=True)
     test_dataset = CacheDataset(test_data, transform=test_transform)
     test_loader = DataLoader(test_dataset, batch_size=8, num_workers=2)
+
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    # model = UNETR(in_channels=4, 
-    #             out_channels=4, 
-    #             out_cls_classes=2, 
-    #             img_size=image_size, 
-    #             tabular_dim=2,
-    #             norm_name='batch').to(device)
+    model = UNETR(
+        in_channels=4,
+        out_channels=4,
+        img_size=(128, 128, 128), 
+        feature_size=16,
+        hidden_size=768,
+        mlp_dim=3072,
+        num_heads=12,
+        norm_name='batch',
+        res_block=True
+    ).to(device)
+
+    loss_seg = DiceLoss(include_background=True, to_onehot_y=True, softmax=True)
     
-    # loss_seg = DiceLoss(include_background=True, to_onehot_y=True, softmax=True)
-    
-    # optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-6)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-6)
+
+    training(
+        model=model,
+        loss_fn=loss_seg,
+        optimizer=optimizer,
+        train_loader=train_loader,
+        val_loader=test_loader,
+        num_classes=4,
+        num_epochs=100,
+        resume_train=False,
+        device=device
+    )
+
+

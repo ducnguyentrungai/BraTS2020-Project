@@ -8,6 +8,10 @@
 *.swp
 *.sh
 *.json
+*.zip
+*.tar.gz
+*.nii
+*.nii.gz
 
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
