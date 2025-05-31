@@ -2,44 +2,6 @@ import torch
 import torch.nn as nn
 from monai.networks.nets import UNETR
 
-# class UNETRMultitaskWithTabular(nn.Module):
-#     def __init__(self, in_channels, out_seg_channels, out_cls_classes, img_size, tabular_dim=2, feature_size=16):
-#         super().__init__()
-#         self.unetr = UNETR(
-#             in_channels=in_channels,
-#             out_channels=out_seg_channels,
-#             img_size=(img_size, img_size, img_size),
-#             feature_size=feature_size,
-#             hidden_size=768,
-#             mlp_dim=3072,
-#             num_heads=12,
-#             norm_name='batch', 
-#         )
-
-#         self.global_pool = nn.AdaptiveAvgPool3d(1)
-#         self.classifier = nn.Sequential(
-#             nn.Linear(out_seg_channels + tabular_dim, 512),
-#             nn.GELU(),
-#             nn.Dropout(0.1),
-            
-#             nn.Linear(512,  256),
-#             nn.GELU(),
-#             nn.Dropout(0.1),
-            
-#             nn.Linear(256, 128),
-#             nn.GELU(),
-            
-#             nn.Linear(128, out_cls_classes)
-#         )
-
-#     def forward(self, x, tabular):
-#         seg_output = self.unetr(x)
-#         pooled_feat = self.global_pool(seg_output).view(x.size(0), -1)
-#         concat_feat = torch.cat([pooled_feat, tabular], dim=1)
-#         cls_output = self.classifier(concat_feat)
-#         return seg_output, cls_output
-    
-    
 class UNETRMultitaskWithTabular(nn.Module):
     def __init__(self, in_channels:int, out_seg_channels:int, out_cls_classes:int,
                  img_size, feature_size=16, hidden_size=768, mlp_dim=3072, num_heads=12,

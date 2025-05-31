@@ -19,6 +19,8 @@ from monai.transforms import Compose, LoadImaged, EnsureChannelFirstd, Spacingd,
 from multitask_model import UNETRMultitaskWithTabular
 
 
+
+
 class MultitaskDataset(Dataset):
     def __init__(self, data_list, transform=None):
         self.data_list = data_list
