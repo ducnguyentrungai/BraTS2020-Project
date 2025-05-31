@@ -1,0 +1,18 @@
+Model: SVM
+Accuracy: 0.5208
+
+Confusion Matrix:
+[[ 3  2  2]
+ [ 7 18  5]
+ [ 3  4  4]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+        Long       0.23      0.43      0.30         7
+      Medium       0.75      0.60      0.67        30
+       Short       0.36      0.36      0.36        11
+
+    accuracy                           0.52        48
+   macro avg       0.45      0.46      0.44        48
+weighted avg       0.59      0.52      0.54        48

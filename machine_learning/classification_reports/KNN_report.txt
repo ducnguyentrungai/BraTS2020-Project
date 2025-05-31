@@ -1,0 +1,18 @@
+Model: KNN
+Accuracy: 0.7083
+
+Confusion Matrix:
+[[ 3  3  1]
+ [ 1 29  0]
+ [ 1  8  2]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+        Long       0.60      0.43      0.50         7
+      Medium       0.72      0.97      0.83        30
+       Short       0.67      0.18      0.29        11
+
+    accuracy                           0.71        48
+   macro avg       0.66      0.53      0.54        48
+weighted avg       0.69      0.71      0.66        48

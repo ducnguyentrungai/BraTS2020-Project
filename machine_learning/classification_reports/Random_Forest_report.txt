@@ -1,0 +1,18 @@
+Model: Random_Forest
+Accuracy: 0.6250
+
+Confusion Matrix:
+[[ 1  5  1]
+ [ 1 28  1]
+ [ 1  9  1]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+        Long       0.33      0.14      0.20         7
+      Medium       0.67      0.93      0.78        30
+       Short       0.33      0.09      0.14        11
+
+    accuracy                           0.62        48
+   macro avg       0.44      0.39      0.37        48
+weighted avg       0.54      0.62      0.55        48
