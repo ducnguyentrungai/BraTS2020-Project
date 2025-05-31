@@ -34,16 +34,11 @@ class UNETRMultitaskWithTabular(nn.Module):
         super().__init__()
         # Initialize UNETR backbone for 3D segmentation
         self.unetr = UNETR(
-            in_channels=in_channels,
-            out_channels=out_seg_channels,
-            img_size=img_size,
-            feature_size=feature_size,
-            hidden_size=hidden_size,
-            mlp_dim=mlp_dim,
-            num_heads=num_heads,
-            norm_name=norm_name,
-            res_block=res_block,
-            dropout_rate=dropout_rate,
+            in_channels=in_channels, out_seg_channels=out_seg_channels, 
+            out_cls_classes=out_cls_classes, img_size=img_size, 
+            feature_size=16, hidden_size=768, mlp_dim=3072, num_heads=12,
+            norm_name=norm_name, conv_block=True, res_block=True,
+            dropout_rate=0.0, spatial_dims=3, qkv_bias=False,  tabular_dim=0,
         )
         # Global average pooling to get a single feature vector from segmentation output
         self.global_pool = nn.AdaptiveAvgPool3d((1, 1, 1))

@@ -42,30 +42,52 @@ class MultitaskDataset(Dataset):
         item["tabular"] = torch.tensor([age, survival], dtype=torch.float32)
         return item
 
+
 def prepare_data_list(images_path, labels_path, classes_path) -> list:
     df_info = pd.read_csv(classes_path)
-    df_info = df_info.dropna(subset=["Age", "Survival_days", "Extent_of_Resection_encoder"])
-    
-    df_info["Age"] = (df_info["Age"] - df_info["Age"].min()) / (df_info["Age"].max() - df_info["Age"].min())
-    df_info["Survival_days"] = (df_info["Survival_days"] - df_info["Survival_days"].min()) / (df_info["Survival_days"].max() - df_info["Survival_days"].min())
+
+    # Lọc các dòng có đầy đủ thông tin cần thiết
+    df_info = df_info.dropna(subset=[
+        "Brats20ID", "Extent_of_Resection_Encoder", "Age", "Survival_days",
+        "brain_volume", "tumor_pct", "et_pct", "ed_pct", "ncr_net_pct"
+    ])
+
+    # Chuẩn hóa các đặc trưng tabular
+    for col in ["Age", "Survival_days", "brain_volume", "tumor_pct", "et_pct", "ed_pct", "ncr_net_pct"]:
+        df_info[col] = (df_info[col] - df_info[col].min()) / (df_info[col].max() - df_info[col].min())
+
     list_data = []
-    
-    for filename, (_, row) in zip(sorted(os.listdir(images_path)), df_info.iterrows()):
-        image_path = os.path.join(images_path, filename)
-        label_path = os.path.join(labels_path, filename)
+
+    for _, row in df_info.iterrows():
+        id_name = row["Brats20ID"]
+        case_id = id_name.split('_')[-1]
+        image_path = os.path.join(images_path, "image_" + case_id + ".nii.gz")
+        label_path = os.path.join(labels_path, "label_" + case_id + ".nii.gz")
 
         if not os.path.exists(image_path) or not os.path.exists(label_path):
+            print('Not found path!')
             continue
+
+        # Tạo vector đặc trưng tabular
+        tabular_features = [
+            float(row["Age"]),
+            float(row["Survival_days"]),
+            float(row["tumor_pct"]),
+            float(row["et_pct"]),
+            float(row["ed_pct"]),
+            float(row["ncr_net_pct"]),
+            float(row["brain_volume"])
+        ]
 
         list_data.append({
             "image": image_path,
             "label": label_path,
-            "class_label": int(row["Extent_of_Resection_encoder"]),
-            "age": float(row["Age"]),
-            "survival_days": float(row["Survival_days"])
-        }) 
-        
+            "class_label": int(row["Survival_Label"]),
+            "tabular": torch.tensor(tabular_features, dtype=torch.float32)
+        })
+
     return list_data
+
 
 def get_dataset(data_list:list, transform=None):
     return MultitaskDataset(data_list=data_list, transform=transform)
@@ -90,4 +112,9 @@ def get_dataloader(dataset, batch_size: int, num_workers: int, shuffle: bool = F
 
 
 
-
+if __name__ == "__main__":
+    images_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
+    labels_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"
+    table_path = "/work/cuc.buithi/brats_challenge/code/multitask_model/data/survival_info_labeled.csv"
+    out = prepare_data_list(images_path, labels_path, table_path)
+    print(len(out))
