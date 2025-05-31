@@ -152,49 +152,10 @@ def resume_training(model, optimizer, checkpoint_path, device='cpu'):
     return model, optimizer, checkpoint['epoch'] + 1
 
 
-# def auto_select_gpus(n=2, threshold_mem_mb=1000, threshold_util=10):
-#     """
-#     Trả về n GPU rảnh nhất (RAM & load thấp), dùng cho DDP hoặc multi-GPU.
-#     """
-#     try:
-#         nvmlInit()
-#         device_count = nvmlDeviceGetCount()
-#         gpus = []
-
-#         for i in range(device_count):
-#             handle = nvmlDeviceGetHandleByIndex(i)
-#             mem_info = nvmlDeviceGetMemoryInfo(handle)
-#             util_info = nvmlDeviceGetUtilizationRates(handle)
-
-#             mem_used_mb = mem_info.used // 1024**2
-#             gpu_util = util_info.gpu
-
-#             print(f"GPU {i}: Used {mem_used_mb}MB, Util {gpu_util}%")
-
-#             if mem_used_mb < threshold_mem_mb and gpu_util < threshold_util:
-#                 gpus.append((i, mem_used_mb, gpu_util))
-
-#         if not gpus:
-#             print("⚠️ No suitable GPU found. Using default CUDA_VISIBLE_DEVICES.")
-#             return
-
-#         # Sort and pick top n
-#         gpus.sort(key=lambda x: (x[1], x[2]))  # sort by (mem, util)
-#         selected_ids = [str(g[0]) for g in gpus[:n]]
-#         os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(selected_ids)
-#         print(f"✅ Auto-selected GPUs: {selected_ids}")
-
-#     except Exception as e:
-#         print(f"⚠️ GPU auto-selection failed: {e}")
-#     finally:
-#         try:
-#             nvmlShutdown()
-#         except:
-#             pass
-
-def auto_select_gpu():
+def auto_select_gpus(n=4, threshold_mem_mb=1000, threshold_util=10):
     """
-    Luôn chọn GPU có RAM dùng ít nhất và tải thấp nhất, không phụ thuộc ngưỡng.
+    Chọn tự động n GPU rảnh nhất dựa trên RAM và GPU utilization.
+    Gán vào CUDA_VISIBLE_DEVICES.
     """
     try:
         nvmlInit()
@@ -206,21 +167,24 @@ def auto_select_gpu():
             mem_info = nvmlDeviceGetMemoryInfo(handle)
             util_info = nvmlDeviceGetUtilizationRates(handle)
 
-            mem_used_mb = mem_info.used // 1024**2
+            mem_used_mb = mem_info.used // 1024 ** 2
             gpu_util = util_info.gpu
 
-            print(f"GPU {i}: Used {mem_used_mb}MB, Utilization {gpu_util}%")
+            print(f"GPU {i}: Used {mem_used_mb} MB | Utilization {gpu_util}%")
 
-            gpus.append((i, mem_used_mb, gpu_util))
+            if mem_used_mb < threshold_mem_mb and gpu_util < threshold_util:
+                gpus.append((i, mem_used_mb, gpu_util))
 
-        if gpus:
-            # Sắp xếp theo RAM và util, ưu tiên GPU ít dùng nhất
-            gpus.sort(key=lambda x: (x[1], x[2]))
-            selected = gpus[0][0]
-            os.environ["CUDA_VISIBLE_DEVICES"] = str(selected)
-            print(f"✅ Auto-selected GPU: {selected}")
-        else:
-            print("⚠️ No GPUs found. Using default GPU.")
+        if not gpus:
+            print("⚠️ No suitable GPU found. Using default.")
+            return
+
+        # Sort by (memory usage, utilization)
+        gpus.sort(key=lambda x: (x[1], x[2]))
+        selected_ids = [str(g[0]) for g in gpus[:n]]
+
+        os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(selected_ids)
+        print(f"✅ Auto-selected GPUs: {os.environ['CUDA_VISIBLE_DEVICES']}")
 
     except Exception as e:
         print(f"⚠️ GPU auto-selection failed: {e}")
@@ -231,52 +195,6 @@ def auto_select_gpu():
         except:
             pass
 
-
-# class SegModule(pl.LightningModule):
-#     def __init__(self, model, num_classes, lr=1e-3):
-#         super().__init__()
-#         self.model = model
-#         self.lr = lr
-#         self.loss_fn = DiceCELoss(to_onehot_y=True, softmax=True, include_background=False)
-#         self.metric = Metric(num_classes=num_classes, ignore_index=0)
-
-#     def forward(self, x):
-#         return self.model(x)
-
-#     def training_step(self, batch, batch_idx):
-#         x = batch['image']
-#         y = batch['label']
-#         y_hat = self(x)
-#         loss = self.loss_fn(y_hat, y)
-
-#         iou = self.metric.IoU(y_hat, y)
-#         dice = self.metric.Dice(y_hat, y)
-
-#         self.log_dict({
-#             'train/loss': loss,
-#             'train/iou': iou,
-#             'train/dice': dice,
-#         }, prog_bar=True)
-#         return loss
-
-#     def validation_step(self, batch, batch_idx):
-#         x = batch['image']
-#         y = batch['label']
-#         y_hat = self(x)
-#         loss = self.loss_fn(y_hat, y)
-
-#         iou = self.metric.IoU(y_hat, y)
-#         dice = self.metric.Dice(y_hat, y)
-
-#         self.log_dict({
-#             'val/loss': loss,
-#             'val/iou': iou,
-#             'val/dice': dice,
-#         }, prog_bar=True)
-#         return loss
-
-#     def configure_optimizers(self):
-#         return Adam(self.model.parameters(), lr=self.lr)
 
 
 def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: DataLoader,
@@ -386,10 +304,101 @@ def training(model, loss_fn, optimizer, train_loader: DataLoader, val_loader: Da
     h, m, s = elapsed // 3600, (elapsed % 3600) // 60, elapsed % 60
     print(f"Training time: {h}h {m}m {s}s")
 
+################## TU CODE ########################################################
+import pytorch_lightning as pl
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+from pytorch_lightning.loggers import CSVLogger
+from pytorch_lightning.strategies import DDPStrategy
+
+class SegModule(pl.LightningModule):
+    def __init__(self, model, loss_fn, metric, lr=1e-4, num_classes=2, include_background=True):
+        super().__init__()
+        self.model = model
+        self.loss_fn = loss_fn
+        self.metric = metric
+        self.lr = lr
+        self.num_classes = num_classes
+        self.include_background = include_background
+
+    def forward(self, x):
+        return self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        image = batch['image']
+        label = batch['label']
+        output = self.model(image)
+        loss = self.loss_fn(output, label)
+
+        iou = self.metric.IoU(output, label)
+        dice = self.metric.Dice(output, label)
+        sensi = self.metric.Sensitivity(output, label)
+        speci = self.metric.Specificity(output, label)
+        acc = self.metric.Accuracy(output, label)
+
+        self.log_dict({'train_loss': loss, 'train_iou': iou, 'train_dice': dice,
+                       'train_sensi': sensi, 'train_speci': speci, 'train_acc': acc}, 
+                       prog_bar=True,
+                       sync_dist=True
+                    )
+        
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        image = batch['image']
+        label = batch['label']
+        output = self.model(image)
+        loss = self.loss_fn(output, label)
+
+        iou = self.metric.IoU(output, label)
+        dice = self.metric.Dice(output, label)
+        sensi = self.metric.Sensitivity(output, label)
+        speci = self.metric.Specificity(output, label)
+        acc = self.metric.Accuracy(output, label)
+
+        self.log_dict({'val_loss': loss, 'val_iou': iou, 'val_dice': dice,
+                       'val_sensi': sensi, 'val_speci': speci, 'val_acc': acc}, 
+                       prog_bar=True,
+                       sync_dist=True)
+        return loss
+
+    def configure_optimizers(self):
+        return torch.optim.AdamW(self.parameters(), lr=self.lr)
+
+def train_with_lightning(model, train_loader, val_loader, loss_fn, num_classes=2, max_epochs=100, lr=1e-4):
+    metric = Metric(num_classes=num_classes)
+
+    module = SegModule(model, loss_fn, metric, lr=lr, num_classes=num_classes)
+
+    checkpoint_callback = ModelCheckpoint(
+        monitor='val_dice',  # đổi từ val_dice sang train_dice
+        mode='max',
+        save_top_k=1,
+        filename='best_model-{epoch:02d}-{train_dice:.4f}',
+        verbose=True
+    )
+
+    csv_logger = CSVLogger(save_dir="logs", name="segmentation_logs")
+    lr_monitor = LearningRateMonitor(logging_interval='epoch')
+
+    trainer = Trainer(
+        accelerator="gpu",
+        # devices=-1,   # Sử dụng tất cả GPU khả dụng
+        devices=[1, 2, 3, 4], # Sử dụng mong muốn
+        strategy=DDPStrategy(find_unused_parameters=True),
+        max_epochs=max_epochs,
+        logger=csv_logger,
+        callbacks=[checkpoint_callback, lr_monitor],
+        precision=16,  # mixed precision nếu có thể
+        log_every_n_steps=5,
+    )
+
+    trainer.fit(module, train_dataloaders=train_loader, val_dataloaders=val_loader)
+
+################## TU CODE ########################################################
 
 
 if __name__ == "__main__":
-    
     
     # image_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
     # label_paths = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"
@@ -409,56 +418,41 @@ if __name__ == "__main__":
     test_transform = transform_for_test()
     
     train_dataset = Dataset(train_data, transform=train_transform)
-    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=2, drop_last=True)
+    train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=2, drop_last=True)
     
     test_dataset = Dataset(test_data, transform=test_transform)
-    test_loader = DataLoader(test_dataset, batch_size=8, num_workers=2)
+    test_loader = DataLoader(test_dataset, batch_size=2, num_workers=2)
 
-    auto_select_gpu()
+
+    # auto_select_gpus()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"device: {device}")
 
-    model = UNETR(
-        in_channels=4,
-        out_channels=4,
-        img_size=(128, 128, 128), 
-        feature_size=16,
-        hidden_size=768,
-        mlp_dim=3072,
-        num_heads=12,
-        norm_name='batch',
-        res_block=True
+    model = SwinUNETR(
+    img_size=(128, 128, 128),        # ⚠️ vẫn bắt buộc truyền, dù deprecated
+    in_channels=4,
+    out_channels=4,
+    depths=(2, 2, 2, 2),
+    num_heads=(3, 6, 12, 24),
+    feature_size=24,                 # ⚠️ PHẢI dùng 24 hoặc 48 tuỳ thiết kế Swin
+    norm_name='batch',
+    drop_rate=0.0,
+    attn_drop_rate=0.0,
+    dropout_path_rate=0.0,
+    normalize=True,
+    use_checkpoint=False,
+    spatial_dims=3,
+    downsample='merging',
+    use_v2=False                     # hoặc True nếu bạn dùng SwinV2
     ).to(device)
-
-    # loss_seg = DiceLoss(
-    # include_background=False,
-    # to_onehot_y=True,
-    # softmax=True,
-    # ) 
     
-    loss_seg = DiceCELoss(
-    include_background=True,
+    loss_seg = DiceLoss(
+    include_background=False,
     to_onehot_y=True,
     softmax=True,
-    lambda_dice=1.0,
-    lambda_ce=0.5
-    )   
+    ) 
     
-    # train_2 1.0 - 0.3
-    
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-    training(
-        model=model,
-        loss_fn=loss_seg,
-        optimizer=optimizer,
-        train_loader=train_loader,
-        val_loader=test_loader,
-        num_classes=4,
-        num_epochs=100,
-        include_background=False,
-        resume_train=False,
-        device=device
-    )
+    train_with_lightning(model, train_loader, test_loader, loss_seg, num_classes=4, max_epochs=100)
 
 

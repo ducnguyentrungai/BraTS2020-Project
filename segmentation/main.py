@@ -137,7 +137,7 @@ def get_new_log_dir(base='logs'):
             return path
         i += 1
 
-def resume_training(model, optimizer, checkpoint_path, device='cpu'):
+def resume_training(model, optimizer, checkpoint_path, device:None):
     if not os.path.exists(checkpoint_path):
         print("Checkpoint not found, starting from scratch.")
         return model.to(device), optimizer, 0
@@ -409,39 +409,57 @@ if __name__ == "__main__":
     test_transform = transform_for_test()
     
     train_dataset = Dataset(train_data, transform=train_transform)
-    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=2, drop_last=True)
+    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=2, drop_last=True)
     
     test_dataset = Dataset(test_data, transform=test_transform)
-    test_loader = DataLoader(test_dataset, batch_size=8, num_workers=2)
+    test_loader = DataLoader(test_dataset, batch_size=4, num_workers=2)
 
     auto_select_gpu()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = UNETR(
-        in_channels=4,
-        out_channels=4,
-        img_size=(128, 128, 128), 
-        feature_size=16,
-        hidden_size=768,
-        mlp_dim=3072,
-        num_heads=12,
-        norm_name='batch',
-        res_block=True
+    # model = UNETR(
+    #     in_channels=4,
+    #     out_channels=4,
+    #     img_size=(128, 128, 128), 
+    #     feature_size=16,
+    #     hidden_size=768,
+    #     mlp_dim=3072,
+    #     num_heads=12,
+    #     norm_name='batch',
+    #     res_block=True
+    # ).to(device)
+    
+    model = SwinUNETR(
+    img_size=(128, 128, 128),        # ⚠️ vẫn bắt buộc truyền, dù deprecated
+    in_channels=4,
+    out_channels=4,
+    depths=(2, 2, 2, 2),
+    num_heads=(3, 6, 12, 24),
+    feature_size=24,                 # ⚠️ PHẢI dùng 24 hoặc 48 tuỳ thiết kế Swin
+    norm_name='batch',
+    drop_rate=0.0,
+    attn_drop_rate=0.0,
+    dropout_path_rate=0.0,
+    normalize=True,
+    use_checkpoint=False,
+    spatial_dims=3,
+    downsample='merging',
+    use_v2=False                     # hoặc True nếu bạn dùng SwinV2
     ).to(device)
 
-    # loss_seg = DiceLoss(
-    # include_background=False,
-    # to_onehot_y=True,
-    # softmax=True,
-    # ) 
-    
-    loss_seg = DiceCELoss(
-    include_background=True,
+    loss_seg = DiceLoss(
+    include_background=False,
     to_onehot_y=True,
     softmax=True,
-    lambda_dice=1.0,
-    lambda_ce=0.5
-    )   
+    ) 
+    
+    # loss_seg = DiceCELoss(
+    # include_background=True,
+    # to_onehot_y=True,
+    # softmax=True,
+    # lambda_dice=1.0,
+    # lambda_ce=0.3
+    # )   
     
     # train_2 1.0 - 0.3
     
