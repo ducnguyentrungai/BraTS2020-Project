@@ -447,7 +447,7 @@ if __name__ == "__main__":
     ).to(device)
     
     loss_seg = DiceLoss(
-    include_background=False,
+    include_background=True,
     to_onehot_y=True,
     softmax=True,
     ) 
