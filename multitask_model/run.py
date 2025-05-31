@@ -4,10 +4,9 @@ from training_multitask import *
 import torch
 from pprint import pprint
 if __name__ == "__main__":
-    images_path = "/work/cuc.buithi/brats_challenge/subdata/Training/imagesTr"
-    labels_path = "/work/cuc.buithi/brats_challenge/subdata/Training/labelsTr"
-    cls_path = "/work/cuc.buithi/brats_challenge/subdata/data_info.csv"
-    
+    images_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
+    labels_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"
+    cls_path = "/work/cuc.buithi/brats_challenge/code/multitask_model/data/survival_info_labeled.csv"
     
     train_transform = Compose([
     LoadImaged(keys=["image", "label"]),
