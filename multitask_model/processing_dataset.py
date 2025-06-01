@@ -19,8 +19,6 @@ from monai.transforms import Compose, LoadImaged, EnsureChannelFirstd, Spacingd,
 from multitask_model import UNETRMultitaskWithTabular
 
 
-
-
 class MultitaskDataset(Dataset):
     def __init__(self, data_list, transform=None):
         self.data_list = data_list
@@ -31,15 +29,15 @@ class MultitaskDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.data_list[idx].copy()
-        class_label = item.pop("class_label")
-        age = item.pop("age")
-        survival = item.pop("survival_days")
+        class_label = item["class_label"]
+        tabular = item["tabular"]
 
         if self.transform:
             item = self.transform(item)
 
         item["class_label"] = torch.tensor(class_label, dtype=torch.long)
-        item["tabular"] = torch.tensor([age, survival], dtype=torch.float32)
+        item["tabular"] = torch.tensor(tabular, dtype=torch.float32)
+
         return item
 
 
@@ -72,6 +70,7 @@ def prepare_data_list(images_path, labels_path, classes_path) -> list:
         tabular_features = [
             float(row["Age"]),
             float(row["Survival_days"]),
+            float(row["Extent_of_Resection_Encoder"]),
             float(row["tumor_pct"]),
             float(row["et_pct"]),
             float(row["ed_pct"]),
@@ -82,7 +81,7 @@ def prepare_data_list(images_path, labels_path, classes_path) -> list:
         list_data.append({
             "image": image_path,
             "label": label_path,
-            "class_label": int(row["Survival_Label"]),
+            "class_label": int(row["Survival_Class"]),
             "tabular": torch.tensor(tabular_features, dtype=torch.float32)
         })
 

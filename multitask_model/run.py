@@ -3,6 +3,7 @@ from monai.transforms import Compose, LoadImaged, EnsureChannelFirstd, Spacingd,
 from training_multitask import *
 import torch
 from pprint import pprint
+
 if __name__ == "__main__":
     images_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
     labels_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"

@@ -7,7 +7,7 @@ from monai.utils import first
 from monai.losses import DiceFocalLoss, DiceLoss
 from monai.metrics import DiceMetric, MeanIoU
 from multitask_model import UNETRMultitaskWithTabular
-from Metric import Metric
+from code.multitask_model.Metrics import Metric
 import wandb
 import os
 import time
