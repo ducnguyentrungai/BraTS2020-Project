@@ -1,4 +1,4 @@
-#!/bin/bash
+conda deactivate#!/bin/bash
 
 srun --pty \
     --job-name=brats-seg \

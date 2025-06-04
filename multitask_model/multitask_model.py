@@ -7,7 +7,7 @@ class UNETRMultitaskWithTabular(nn.Module):
                  img_size, feature_size=16, hidden_size=768, mlp_dim=3072, num_heads=12,
                  norm_name='instance', conv_block=True, res_block=True,
                  dropout_rate=0.0, spatial_dims=3, qkv_bias=False, 
-                 tabular_dim=0, classifier_hidden_dim=[256, 128 , 64, 7]):
+                 tabular_dim=0, classifier_hidden_dim=[256, 128 , 64]):
         super().__init__()
         # Initialize UNETR backbone for 3D segmentation
         self.unetr = UNETR(
@@ -39,16 +39,30 @@ class UNETRMultitaskWithTabular(nn.Module):
             self.classifier = nn.Sequential(
                 nn.Linear(classifier_input_dim, out_cls_classes)
             )
-
-    
+            
     def forward(self, image, tabular):
-        # Segmentation output from UNETR
-        seg_output = self.unetr(image)  # (B, out_seg_channels, D, H, W)
-        # Global average pooling over the segmentation output (spatial dimensions) to get feature vector
-        pooled_features = self.global_pool(seg_output)  # (B, out_seg_channels, 1, 1, 1)
-        pooled_features = pooled_features.view(pooled_features.size(0), -1)  # (B, out_seg_channels)
-        # Concatenate pooled image features with tabular data
-        combined_features = torch.cat((pooled_features, tabular), dim=1)  # (B, out_seg_channels + tabular_dim)
-        # Classification prediction from MLP
-        cls_output = self.classifier(combined_features)  # (B, out_cls_classes)
+        seg_output = self.unetr(image)  # (B, C, D, H, W)
+        pooled_features = self.global_pool(seg_output).view(seg_output.size(0), -1)
+
+        # Đảm bảo tabular có đúng shape, device và dtype
+        if tabular.ndim == 1:
+            tabular = tabular.unsqueeze(1)
+        tabular = tabular.to(device=pooled_features.device, dtype=pooled_features.dtype)
+
+        combined_features = torch.cat((pooled_features, tabular), dim=1)
+        cls_output = self.classifier(combined_features)
         return seg_output, cls_output
+
+
+if __name__ == "__main__":
+    model = UNETRMultitaskWithTabular(
+        in_channels=1, out_seg_channels=4, out_cls_classes=3,
+        img_size=(96, 96, 96), tabular_dim=8
+    )
+
+    x = torch.randn(2, 1, 96, 96, 96)  # 2 ảnh
+    t = torch.randn(2, 8)  # 2 dòng tabular
+    seg, cls = model(x, t)
+
+    print("Seg out:", seg.shape)  # expect: (2, 4, 96, 96, 96)
+    print("Cls out:", cls.shape)  # expect: (2, 3)

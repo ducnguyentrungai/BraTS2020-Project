@@ -29,15 +29,23 @@ class MultitaskDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.data_list[idx].copy()
+        
         class_label = item["class_label"]
         tabular = item["tabular"]
+        transform_input = {"image": item["image"], "label": item["label"]}
 
         if self.transform:
-            item = self.transform(item)
+            transformed = self.transform(transform_input)
+            item['image'] = transformed['image']
+            item['label'] = transformed['label']
 
-        item["class_label"] = torch.tensor(class_label, dtype=torch.long)
-        item["tabular"] = torch.tensor(tabular, dtype=torch.float32)
+        if not isinstance(class_label, torch.Tensor):
+            class_label = torch.tensor(class_label, dtype=torch.long)
+        if not isinstance(tabular, torch.Tensor):
+            tabular = torch.tensor(tabular, dtype=torch.float32)
 
+        item["class_label"] = class_label
+        item["tabular"] = tabular
         return item
 
 
@@ -87,7 +95,6 @@ def prepare_data_list(images_path, labels_path, classes_path) -> list:
 
     return list_data
 
-
 def get_dataset(data_list:list, transform=None):
     return MultitaskDataset(data_list=data_list, transform=transform)
 
@@ -114,6 +121,23 @@ def get_dataloader(dataset, batch_size: int, num_workers: int, shuffle: bool = F
 if __name__ == "__main__":
     images_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/imageTr"
     labels_path = "/work/cuc.buithi/brats_challenge/data/train_t1_t1ce_t2_flair/labelTr"
-    table_path = "/work/cuc.buithi/brats_challenge/code/multitask_model/data/survival_info_labeled.csv"
+    table_path = "/work/cuc.buithi/brats_challenge/code/multitask_model/data/survival.csv"
+    transform = Compose([
+    LoadImaged(keys=["image", "label"]),
+    EnsureChannelFirstd(keys=["image", "label"]),
+    Spacingd(keys=["image", "label"], pixdim=(1.5, 1.5, 2.0), mode=("bilinear", "nearest")),
+    Orientationd(keys=["image", "label"], axcodes="RAS"),
+    ScaleIntensityd(keys=["image"]),
+    Resized(keys=["image", "label"], spatial_size=(128, 128, 128)),
+    ToTensord(keys=["image", "label"]),
+    CastToTyped(keys=["label"], dtype=torch.long),
+    ])
     out = prepare_data_list(images_path, labels_path, table_path)
-    print(len(out))
+    dataset = get_dataset(out, transform)
+    data1 = dataset.__getitem__(1)
+    pprint(dataset.__getitem__(1))
+    # image = data1['image'].numpy()
+    # plt.imshow(image[3, :, :, 69])
+    # plt.savefig('image.png', bbox_inches='tight')
+    # print(image.shape)
+    

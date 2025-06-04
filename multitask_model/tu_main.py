@@ -253,6 +253,10 @@ class MultiTaskSegModule(LightningModule):
         preds = torch.argmax(cls_output, dim=1).cpu().numpy()
         targets = class_label.cpu().numpy()
         
+        print("Preds:", preds.tolist())
+        print("Targets:", targets.tolist())
+
+        
         print('shape pred', preds.shape)
 
         try:

@@ -9,9 +9,8 @@ from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 from sklearn.model_selection import RandomizedSearchCV
 
+
 survival_df = pd.read_csv('/work/cuc.buithi/brats_challenge/test/survival_info_filled.csv')
-
-
 
 X = survival_df[['Age','tumor_volume', 'ncr_net_volume', 'ed_volume', 'et_volume', 'brain_volume', 'tumor_pct', 'ncr_net_pct', 'ed_pct', 'et_pct', 'Extent_of_Resection_Encoder']]
 y = survival_df['Survival_days']

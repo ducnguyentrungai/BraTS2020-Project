@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # Giả sử bạn đã có cột Survival_Class
     train_df, test_df = train_test_split(
         df,
-        test_size=0.1,             
+        test_size=0.2,             
         stratify=df['Survival_Class'],  # Bảo đảm tỷ lệ giữa các class giống nhau ở train/test
         random_state=42
     )
