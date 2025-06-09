@@ -52,7 +52,7 @@ def auto_select_gpus(n=3, threshold_mem_mb=800, threshold_util=10):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/data/train_flair_t1_t1ce_t2'
-    batch_size = 4
+    batch_size = 2
     spatial_size = (128, 128, 128)
     num_classes = 4 
     in_channels = 4 
@@ -82,7 +82,7 @@ def train():
         model=model,
         loss_fn=loss_fn,
         optim=optimizer,
-        lr=3e-4,
+        lr=2e-4,
         num_classes=num_classes,
         include_background=False,
         log_dir=log_dir
@@ -114,12 +114,13 @@ def train():
 
     # ==== Trainer ====
     trainer = Trainer(
-        max_epochs=100,
+        max_epochs=500,
         accelerator=accelerator,
         devices=devices,
         strategy=strategy,
+        precision=16,
         callbacks=[checkpoint_cb],
-        log_every_n_steps=1,
+        log_every_n_steps=10,
         default_root_dir=log_dir
     )
 

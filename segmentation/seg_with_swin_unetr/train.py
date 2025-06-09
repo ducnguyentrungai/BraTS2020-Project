@@ -54,7 +54,7 @@ if __name__ == "__main__":
     model = SwinUNETRModule()
 
     trainer = Trainer(
-        max_epochs=100,
+        max_epochs=200,
         accelerator="gpu", devices=1,
         callbacks=[checkpoint_cb],
         log_every_n_steps=10

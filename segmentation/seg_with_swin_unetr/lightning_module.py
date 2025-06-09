@@ -44,6 +44,7 @@ class LitSegSwinUNETR(pl.LightningModule):
         acc  = self.metric.Accuracy(yhat, y)
         return loss, iou, dice, sens, spec, acc
 
+    
     def training_step(self, batch, batch_idx):
         loss, iou, dice, sens, spec, acc = self.shared_step(batch)
         self.log_dict({
@@ -74,6 +75,11 @@ class LitSegSwinUNETR(pl.LightningModule):
             self.print(f"[Val][Epoch {self.current_epoch}][Batch {batch_idx}] Loss: {loss:.4f}, Dice: {dice:.4f}")
         return {"val_loss": loss, "val_iou": iou, "val_dice": dice, "val_sens": sens, "val_spec": spec, "val_acc": acc}
 
+    
+    def on_train_start(self):
+        if self.trainer.is_global_zero:
+            print(f"[INFO] Training started with {self.trainer.num_devices} GPUs (DDP World Size)")
+            
     def on_train_epoch_end(self):
         epoch = self.current_epoch
         metrics = self.trainer.callback_metrics
