@@ -28,13 +28,12 @@ class LitSegSwinUNETR(pl.LightningModule):
         with open(self.val_log_file, 'w', newline='') as f:
             csv.writer(f).writerow(['Epoch', 'Val_Loss', 'Val_IoU', 'Val_Dice', 'Val_Sensitivity', 'Val_Specificity', 'Val_Accuracy'])
 
-        self.save_hyperparameters()
-
     def forward(self, x):
         return self.model(x)
 
     def shared_step(self, batch):
         x, y = batch["image"], batch["label"]
+        print(f"[RANK {self.global_rank}] Batch device: {x.device}")
         yhat = self(x)
         loss = self.loss_fn(yhat, y)
         iou = self.metric.IoU(yhat, y)
@@ -76,10 +75,17 @@ class LitSegSwinUNETR(pl.LightningModule):
         return {"val_loss": loss, "val_iou": iou, "val_dice": dice, "val_sens": sens, "val_spec": spec, "val_acc": acc}
 
     
-    def on_train_start(self):
+    def on_fit_start(self):
         if self.trainer.is_global_zero:
-            print(f"[INFO] Training started with {self.trainer.num_devices} GPUs (DDP World Size)")
-            
+            print("=" * 40)
+            print(f"[INFO] Fit started with:")
+            print(f"  Devices        : {self.trainer.num_devices}")
+            print(f"  Strategy       : {self.trainer.strategy.__class__.__name__}")
+            print(f"  World Size     : {getattr(self.trainer, 'world_size', 'unknown')}")
+            print(f"  Precision      : {self.trainer.precision_plugin.precision}")
+            print(f"  Accelerator    : {self.trainer.accelerator.__class__.__name__}")
+            print("=" * 40)
+
     def on_train_epoch_end(self):
         epoch = self.current_epoch
         metrics = self.trainer.callback_metrics

@@ -6,48 +6,136 @@ from pytorch_lightning import LightningDataModule
 import torch.distributed as dist
 from monai.data.utils import partition_dataset
 
+# def get_transforms(spatial_size=(128, 128, 128), is_train=True):
+#     from monai.transforms import (
+#         LoadImaged, EnsureChannelFirstd, Spacingd, Orientationd,
+#         ScaleIntensityRanged, CropForegroundd, Resized,
+#         RandCropByPosNegLabeld, RandFlipd, RandRotate90d,
+#         ToTensord, Compose, RandGaussianNoised, RandGaussianSmoothd,
+#         Zoomd, Rand3DElasticd, CenterSpatialCropd
+#     )
+
+#     base = [
+#         LoadImaged(keys=["image", "label"]),
+#         EnsureChannelFirstd(keys=["image", "label"]),
+#         ScaleIntensityRanged(keys=["image"], a_min=0, a_max=255, b_min=0.0, b_max=1.0, clip=True),
+#     ]
+
+#     if is_train:
+#         base += [
+#             Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
+#             RandCropByPosNegLabeld(
+#                 keys=["image", "label"],
+#                 label_key="label",
+#                 spatial_size=spatial_size,
+#                 pos=1,
+#                 neg=1,
+#                 num_samples=1,
+#                 image_key="image",
+#                 image_threshold=0,
+#             ),
+#             RandFlipd(keys=["image", "label"], spatial_axis=[0], prob=0.2),
+#             RandFlipd(keys=["image", "label"], spatial_axis=[1], prob=0.2),
+#             CropForegroundd(keys=["image", "label"], source_key="image", allow_smaller=True),
+#             Orientationd(keys=["image", "label"], axcodes="RAS"),
+#             RandGaussianNoised(keys=["image"], prob=0.2),
+#             RandGaussianSmoothd(keys=["image"], prob=0.3),
+#             RandRotate90d(keys=["image", "label"], prob=0.2, max_k=3),
+#             Zoomd(keys=["image", "label"], zoom=1.4, mode=['area', 'nearest']),
+#             CenterSpatialCropd(keys=["image", "label"], roi_size=(96, 96, 96)),
+#             Rand3DElasticd(keys=["image", "label"], sigma_range=(5, 7), magnitude_range=(100, 200), prob=0.3),
+#         ]
+
+#     # Add final transforms
+#     base += [
+#         ToTensord(keys=["image", "label"]),  
+#         Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest"))
+#     ]
+    
+#     return Compose(base)
+
+
 def get_transforms(spatial_size=(128, 128, 128), is_train=True):
     from monai.transforms import (
         LoadImaged, EnsureChannelFirstd, Spacingd, Orientationd,
         ScaleIntensityRanged, CropForegroundd, Resized,
         RandCropByPosNegLabeld, RandFlipd, RandRotate90d,
-        ToTensord, Compose, RandGaussianNoised, RandGaussianSmoothd
+        ToTensord, Compose, RandGaussianNoised, RandGaussianSmoothd,
+        Zoomd, Rand3DElasticd, CenterSpatialCropd, RandShiftIntensityd,
+        RandAdjustContrastd, RandScaleIntensityd, SpatialPadd, 
+        RandSpatialCropd, RandAffined, NormalizeIntensityd, 
+        ThresholdIntensityd
     )
 
     base = [
         LoadImaged(keys=["image", "label"]),
         EnsureChannelFirstd(keys=["image", "label"]),
-        Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
-        Orientationd(keys=["image", "label"], axcodes="RAS"),
+        # Intensity preprocessing
         ScaleIntensityRanged(keys=["image"], a_min=0, a_max=255, b_min=0.0, b_max=1.0, clip=True),
-        CropForegroundd(keys=["image", "label"], source_key="image"),
-        Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
+        ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),  # Remove negative values
+        NormalizeIntensityd(keys=["image"], nonzero=True, channel_wise=True),  # Z-score normalization
     ]
 
     if is_train:
         base += [
+            # Spatial preprocessing
+            Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
+            Orientationd(keys=["image", "label"], axcodes="RAS"),
+            CropForegroundd(keys=["image", "label"], source_key="image", allow_smaller=True),
+            SpatialPadd(keys=["image", "label"], spatial_size=spatial_size, mode='constant'),
+            
+            # Cropping augmentations
             RandCropByPosNegLabeld(
                 keys=["image", "label"],
                 label_key="label",
                 spatial_size=spatial_size,
                 pos=1,
                 neg=1,
-                num_samples=1,  # Chỉnh lại để trả về duy nhất 1 sample
+                num_samples=1,
                 image_key="image",
                 image_threshold=0,
             ),
-            RandFlipd(keys=["image", "label"], spatial_axis=[0], prob=0.2),
-            RandFlipd(keys=["image", "label"], spatial_axis=[1], prob=0.2),
-            RandGaussianNoised(keys=["image"], prob=0.2),
-            RandGaussianSmoothd(keys=["image"], prob=0.3),
-            RandRotate90d(keys=["image", "label"], prob=0.2, max_k=3),
+            RandSpatialCropd(keys=["image", "label"], roi_size=(int(spatial_size[0]*0.9), 
+                                                               int(spatial_size[1]*0.9), 
+                                                               int(spatial_size[2]*0.9)), 
+                           random_center=True, random_size=True),
             
-            Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
+            # Geometric augmentations
+            RandFlipd(keys=["image", "label"], spatial_axis=[0], prob=0.3),
+            RandFlipd(keys=["image", "label"], spatial_axis=[1], prob=0.3),
+            RandFlipd(keys=["image", "label"], spatial_axis=[2], prob=0.2),
+            RandRotate90d(keys=["image", "label"], prob=0.3, max_k=3),
+            RandAffined(
+                keys=["image", "label"],
+                mode=("bilinear", "nearest"),
+                prob=0.4,
+                spatial_size=spatial_size,
+                rotate_range=(0.2, 0.2, 0.2),
+                scale_range=(0.1, 0.1, 0.1),
+                translate_range=(10, 10, 10),
+                padding_mode="border"
+            ),
+            Zoomd(keys=["image", "label"], zoom=1.4, mode=['area', 'nearest']),
+            CenterSpatialCropd(keys=["image", "label"], roi_size=(96, 96, 96)),
+            Rand3DElasticd(keys=["image", "label"], sigma_range=(5, 7), magnitude_range=(100, 200), prob=0.3),
+            
+            # Intensity augmentations
+            RandShiftIntensityd(keys=["image"], offsets=0.1, prob=0.4),
+            RandScaleIntensityd(keys=["image"], factors=0.2, prob=0.4),
+            RandAdjustContrastd(keys=["image"], prob=0.3, gamma=(0.7, 1.5)),
+            
+            # Noise augmentations
+            RandGaussianNoised(keys=["image"], prob=0.3, mean=0.0, std=0.05),
+            RandGaussianSmoothd(keys=["image"], prob=0.3, sigma_x=(0.5, 1.5), sigma_y=(0.5, 1.5), sigma_z=(0.5, 1.5)),
         ]
 
-    base.append(ToTensord(keys=["image", "label"]))
+    # Add final transforms
+    base += [
+        ToTensord(keys=["image", "label"]),  
+        Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest"))
+    ]
+    
     return Compose(base)
-
 
 def extract_data_dicts(data_dir:str, train_percent:float=0.8):
     images = sorted(glob.glob(os.path.join(data_dir, "imageTr", "*.nii.gz")))
@@ -57,14 +145,9 @@ def extract_data_dicts(data_dir:str, train_percent:float=0.8):
     train_dicts, val_dicts = train_test_split(data_dicts, train_size=train_percent, random_state=42, shuffle=True)
     return train_dicts, val_dicts
 
-# def get_dataloader(data_dicts, batch_size=4, is_train=True, spatial_size=(128, 128, 128), num_workers=2):
-#     transforms = get_transforms(spatial_size=spatial_size, is_train=is_train)
-#     dataset = SmartCacheDataset(data=data_dicts, transform=transforms, cache_num=800, replace_rate=0.2)
-#     return DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, drop_last=True)
-
-def get_dataloader(data_dicts, batch_size=4, is_train=True, spatial_size=(128, 128, 128), num_workers=2, cache_num=280): 
+def get_dataloader(data_dicts, batch_size=4, is_train=True, spatial_size=(128, 128, 128), num_workers=2, cache_num=100): 
     transforms = get_transforms(spatial_size=spatial_size, is_train=is_train)
-
+    
     if is_train:
         # Tự động lấy rank GPU nếu đang chạy DDP
         if dist.is_available() and dist.is_initialized():
