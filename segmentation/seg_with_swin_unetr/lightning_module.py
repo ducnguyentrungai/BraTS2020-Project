@@ -1,8 +1,5 @@
-import torch
 import pytorch_lightning as pl
-from monai.metrics import DiceMetric
 from metrics import Metric
-from tabulate import tabulate
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import torch.distributed as dist
 from pytorch_lightning.utilities.rank_zero import rank_zero_only
@@ -45,7 +42,6 @@ class LitSegSwinUNETR(pl.LightningModule):
         return self.model(x)
 
     def shared_step(self, batch):
-        # print(batch)
         if isinstance(batch, list) or isinstance(batch, tuple):
             batch = batch[0]  # chỉ lấy phần tử đầu tiên nếu batch là list of dicts
         x, y = batch["image"], batch["label"]

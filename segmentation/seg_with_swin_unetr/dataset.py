@@ -91,7 +91,6 @@ class BratsDataModule(LightningDataModule):
             collate_fn=list_data_collate 
         )
 
-
 def extract_data_dicts(data_dir:str, train_percent:float=0.8):
     images = sorted(glob.glob(os.path.join(data_dir, "imageTr", "*.nii.gz")))
     labels = sorted(glob.glob(os.path.join(data_dir, "labelTr", "*.nii.gz")))
