@@ -16,6 +16,7 @@
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
+
 # Ignore Python cache
 __pycache__/
 *.pyc
@@ -35,6 +36,7 @@ logs/
 *.h5
 *.pth
 *.ckpt
+*.local
 
 # Data exports
 *.csv
