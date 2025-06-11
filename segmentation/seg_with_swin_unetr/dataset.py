@@ -52,23 +52,37 @@ class BratsDataModule(LightningDataModule):
             even_divisible=True
         )
         my_train_data = train_partitioned[rank]
-
-        self.train_dataset = SmartCacheDataset(
+        
+        # self.train_dataset = SmartCacheDataset(
+        #     data=my_train_data,
+        #     transform=get_transforms(self.spatial_size, is_train=True),
+        #     cache_num=min(self.cache_num, len(my_train_data)),
+        #     replace_rate=0.1
+        # )
+        
+        self.train_dataset = CacheDataset(
             data=my_train_data,
             transform=get_transforms(self.spatial_size, is_train=True),
-            cache_num=min(self.cache_num, len(my_train_data)),
-            replace_rate=0.1
+            cache_rate=1.0,
+            num_workers=self.num_workers,
+            progress=True
         )
 
-        val_cache_num = len(self.val_dicts) if self.cache_num_val_all else min(self.cache_num, len(self.val_dicts))
-
-        self.val_dataset = SmartCacheDataset(
+        # val_cache_num = len(self.val_dicts) if self.cache_num_val_all else min(self.cache_num, len(self.val_dicts))
+        # self.val_dataset = SmartCacheDataset(
+        #     data=self.val_dicts,
+        #     transform=get_transforms(self.spatial_size, is_train=False),
+        #     cache_num=val_cache_num,
+        #     replace_rate=1.0
+        # )
+        
+        self.val_dataset = CacheDataset(
             data=self.val_dicts,
             transform=get_transforms(self.spatial_size, is_train=False),
-            cache_num=val_cache_num,
-            replace_rate=1.0
+            cache_rate=1.0, 
+            num_workers=self.num_workers
         )
-
+        
     def train_dataloader(self):
         return DataLoader(
             self.train_dataset,
@@ -117,8 +131,8 @@ def get_transforms(spatial_size=(128, 128, 128), is_train=True):
         EnsureChannelFirstd(keys=["image", "label"]),
         # Intensity preprocessing
         ScaleIntensityRanged(keys=["image"], a_min=0, a_max=255, b_min=0.0, b_max=1.0, clip=True),
-        ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),  # Remove negative values
-        NormalizeIntensityd(keys=["image"], nonzero=True, channel_wise=True),  # Z-score normalization
+        ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),   # Remove negative values
+        NormalizeIntensityd(keys=["image"], nonzero=True, channel_wise=True),       # Z-score normalization
     ]
 
     if is_train:

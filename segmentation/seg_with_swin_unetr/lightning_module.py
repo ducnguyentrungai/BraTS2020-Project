@@ -3,6 +3,10 @@ from metrics import Metric
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import torch.distributed as dist
 from pytorch_lightning.utilities.rank_zero import rank_zero_only
+import os
+import pandas as pd
+import torch
+import matplotlib.pyplot as plt
 
 def is_rank_zero():
     if dist.is_available() and dist.is_initialized():
@@ -25,8 +29,35 @@ def print_metrics_table(epoch, metrics):
     sys.stdout.write(tabulate([row_train, row_val], headers=headers, tablefmt="fancy_grid") + "\n\n")
     sys.stdout.flush()
 
+@rank_zero_only
+def save_metrics_csv(epoch, metrics, path="logs/swin_unetr_metrics.csv"):
+    row = {"epoch": epoch}
+    keys = ['train_loss', 'train_iou', 'train_dice', 'train_sens', 'train_spec', 'train_acc',
+            'val_loss', 'val_iou', 'val_dice', 'val_sens', 'val_spec', 'val_acc']
+    
+    for k in keys:
+        v = metrics.get(k)
+        if isinstance(v, torch.Tensor):
+            v = v.item()
+        row[k] = v if v is not None else float("nan")
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    try:
+        df = pd.read_csv(path)
+        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+    except FileNotFoundError:
+        df = pd.DataFrame([row])
+    df.to_csv(path, index=False)
+
+def show_image(image, title=""):
+    plt.figure(figsize=(5, 5))
+    plt.imshow(image, cmap="gray")
+    plt.title(title)
+    plt.axis("off")
+    plt.show()
+
 class LitSegSwinUNETR(pl.LightningModule):
-    def __init__(self, model, loss_fn, lr, optim, weight_decay=1e-2, num_classes=4, include_background=False):
+    def __init__(self, model, loss_fn, lr, optim, out_path:str, weight_decay=1e-2, num_classes=4, include_background=False):
         super().__init__()
         self.model = model
         self.loss_fn = loss_fn
@@ -35,6 +66,7 @@ class LitSegSwinUNETR(pl.LightningModule):
         self.weight_decay = weight_decay
         self.num_classes = num_classes
         self.include_background = include_background
+        self.out_path = out_path
 
         self.metric = Metric(num_classes, include_background=include_background)
 
@@ -63,7 +95,7 @@ class LitSegSwinUNETR(pl.LightningModule):
             "train_sens": sens,
             "train_spec": spec,
             "train_acc": acc
-        }, on_epoch=True, prog_bar=True, sync_dist=True)
+        }, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -75,8 +107,24 @@ class LitSegSwinUNETR(pl.LightningModule):
             "val_sens": sens,
             "val_spec": spec,
             "val_acc": acc
-        }, on_epoch=True, prog_bar=True, sync_dist=True)
+        }, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True)
+        # 🧪 Visualization
+        if batch_idx == 0 and self.trainer.is_global_zero:  # chỉ in 1 batch đầu
+            x = batch["image"][0]  # (4, 128, 128, 128)
+            y = batch["label"][0]  # (128, 128, 128)
+            yhat = self(batch["image"])[0].argmax(dim=0)  # dự đoán nhãn, shape: (128, 128, 128)
+
+            mid_slice = x.shape[2] // 2
+            input_img = x[0, :, :, mid_slice].detach().cpu().numpy()
+            gt_mask = y[:, :, mid_slice].detach().cpu().numpy()
+            pred_mask = yhat[:, :, mid_slice].detach().cpu().numpy()
+
+            show_image(input_img, "Input image (modal 0, mid slice)")
+            show_image(gt_mask, "Ground Truth")
+            show_image(pred_mask, "Predicted")
+            
         return {"val_loss": loss, "val_iou": iou, "val_dice": dice, "val_sens": sens, "val_spec": spec, "val_acc": acc}
+    
 
     def on_fit_start(self):
         if self.trainer.is_global_zero:
@@ -93,7 +141,8 @@ class LitSegSwinUNETR(pl.LightningModule):
         epoch = self.current_epoch
         metrics = self.trainer.callback_metrics
         print_metrics_table(epoch, metrics)
-
+        save_metrics_csv(epoch, metrics, path=self.out_path)
+        
     def configure_optimizers(self):
         optimizer = self.optim(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         scheduler = {

@@ -63,7 +63,7 @@ def auto_select_gpus(n=3, threshold_mem_mib=10000, threshold_util=55):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/data/train_flair_t1_t1ce_t2'
-    batch_size = 2
+    batch_size = 4
     spatial_size = (128, 128, 128)
     num_classes = 4
     in_channels = 4
@@ -73,12 +73,12 @@ def train():
     log_dir = os.path.join(root_dir, "logs")
 
     # ==== Auto GPU selection ====
-    selected_gpus = auto_select_gpus(n=4, threshold_mem_mib=1000, threshold_util=20)
+    selected_gpus = auto_select_gpus(n=2, threshold_mem_mib=1000, threshold_util=20)
     if selected_gpus:
         os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, selected_gpus))
         accelerator = "gpu"
         devices = len(selected_gpus)
-        strategy = "ddp" if devices > 1 else "auto"
+        strategy = "ddp_find_unused_parameters_false" if devices > 1 else "auto"
         rank_zero_print(f"\u2705 Using GPUs: {selected_gpus}")
     else:
         accelerator = "cpu"
@@ -117,13 +117,27 @@ def train():
     )
     optimizer = AdamW
 
-    lightning_model = LitSegSwinUNETR(
-        model=model,
-        loss_fn=loss_fn,
-        optim=optimizer,
-        lr=2e-5,
-        num_classes=num_classes,
-        include_background=False
+    # lightning_model = LitSegSwinUNETR(
+    #     model=model,
+    #     loss_fn=loss_fn,
+    #     optim=optimizer,
+    #     lr=2e-5,
+    #     num_classes=num_classes,
+    #     include_background=False,
+    #     out_path= os.path.join(log_dir, 'swin_unetr_metrcis.csv')
+    # )
+    
+    # === Load Pre-Training === 
+    checkpoint_path = '/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2/checkpoints/best_model-epoch=29-val_dice=0.6091.ckpt'
+    lightning_model = LitSegSwinUNETR.load_from_checkpoint(
+    checkpoint_path=checkpoint_path,
+    model=model,
+    loss_fn=loss_fn,
+    optim=optimizer,
+    lr=1e-4,
+    num_classes=num_classes,
+    include_background=False,
+    out_path=os.path.join(log_dir, "swin_unetr_metrics.csv")
     )
 
     # ==== Checkpoint Callback ====
@@ -145,7 +159,8 @@ def train():
         accelerator=accelerator,
         devices=devices,
         strategy=strategy,
-        precision=16,
+        precision="16-mixed",       # Mixed Precision (FP16)
+        accumulate_grad_batches=4,  # Mô phỏng batch lớn hơn mà không bị OOM
         callbacks=[checkpoint_cb],
         logger=csv_logger,
         log_every_n_steps=10,

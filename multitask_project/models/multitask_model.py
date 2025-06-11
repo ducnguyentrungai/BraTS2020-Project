@@ -4,6 +4,27 @@ from monai.networks.net import SwinUNETR
 from collections.abc import Sequence
 
 
+class AttentionFustion(nn.Module):
+    def __init__(self, img_dim:int, tab_dim:int, hidden_dim:int=128):
+        super().__init__()
+        self.query_layer = nn.Linear(tab_dim, hidden_dim)
+        self.key_layer = nn.Linear(img_dim, hidden_dim)
+        self.value_layer = nn.Linear(img_dim, hidden_dim)
+        self.output_layer = nn.Linear(hidden_dim, hidden_dim)
+
+    def forward(self, img_feat, tab_feat):
+        # img_feat: (B, C_img), tab_feat: (B, C_tab)
+        query = self.query_layer(tab_feat).unsqueeze(1)        # (B, 1, H)
+        key = self.key_layer(img_feat).unsqueeze(1)            # (B, 1, H)
+        value = self.value_layer(img_feat).unsqueeze(1)        # (B, 1, H)
+
+        attn_scores = torch.bmm(query, key.transpose(1, 2)) / (query.size(-1) ** 0.5)  # (B, 1, 1)
+        attn_weights = torch.softmax(attn_scores, dim=-1) + 1e-6     # (B, 1, 1)
+
+        fused = torch.bmm(attn_weights, value).squeeze(1)      # (B, H)
+        return self.output_layer(fused)                        # (B, H)
+
+
 class MutilModalMutilTaskModel(nn.Module):
     def __init__(self,
                  img_size: Sequence[int] | int,
@@ -12,6 +33,7 @@ class MutilModalMutilTaskModel(nn.Module):
                  cls_classes: int,
                  tabular_dim: int,
                  feature_size: int,
+                 hidden_dim: int,
                  norm_name: tuple | str = 'instance',
                  use_v2 = False
                  ) -> None:
@@ -35,6 +57,9 @@ class MutilModalMutilTaskModel(nn.Module):
             nn.Linear(64, 64),
             nn.GELU()
         )
+        
+        # Attention-bases funsion
+        self.fution = AttentionFustion(img_dim=feature_size * 8, tab_dim=tabular_dim, hidden_dim=hidden_dim)
 
         # Classification head
         self.cls_head = nn.Sequential(
@@ -45,7 +70,7 @@ class MutilModalMutilTaskModel(nn.Module):
             nn.Linear(64, cls_classes)
         )
 
-    def forward(self, image, tabular):
+    def forward(self, image, tabular) -> dict:
         # Segmentation output
         seg_out = self.backbone(image)
 
@@ -57,11 +82,11 @@ class MutilModalMutilTaskModel(nn.Module):
         # Encode tabular data
         tab_feat = self.tabular_encoder(tabular)  # shape: (B, 64)
 
-        # Feature fusion
-        fusion = torch.cat([image_feat, tab_feat], dim=1)  # shape: (B, C+64)
+        # Feature fusion with attention
+        fused_feat = self.fution(image_feat, tab_feat)
 
         # Classification output
-        cls_out = self.cls_head(fusion)  # shape: (B, num_cls)
+        cls_out = self.cls_head(fused_feat)  # shape: (B, num_cls)
 
         return {
             "seg": seg_out,
