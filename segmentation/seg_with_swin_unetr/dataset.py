@@ -1,20 +1,16 @@
 import os
 import glob
-from monai.data import CacheDataset, SmartCacheDataset, Dataset, DataLoader
 from tqdm import tqdm
-from pytorch_lightning import LightningDataModule
+from typing import Sequence, Union
+
 import torch.distributed as dist
-from monai.data.utils import partition_dataset
-from typing import Sequence, Union
-
-from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader
-from typing import Sequence, Union
-
-from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader
 from torch.utils.data._utils.collate import default_collate
+
+from pytorch_lightning import LightningDataModule
+from monai.data.utils import partition_dataset
 from monai.data import list_data_collate
+from monai.data import CacheDataset, SmartCacheDataset, Dataset, DataLoader
+
 
 def dict_collate(batch):
     return default_collate(batch)
@@ -81,7 +77,7 @@ class BratsDataModule(LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=True,
             drop_last=True,
-            collate_fn=list_data_collate  # ⭐ fix lỗi
+            collate_fn=list_data_collate
         )
 
     def val_dataloader(self):
@@ -92,7 +88,7 @@ class BratsDataModule(LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=True,
             drop_last=False,
-            collate_fn=list_data_collate  # ⭐ fix lỗi
+            collate_fn=list_data_collate 
         )
 
 
@@ -186,151 +182,6 @@ def get_transforms(spatial_size=(128, 128, 128), is_train=True):
     ]
     
     return Compose(base)
-
-
-# def get_dataloader(
-#     data_dicts: list[dict],
-#     spatial_size: Union[Sequence[int], int],
-#     batch_size: int,
-#     is_train: bool = True,
-#     num_workers: int = 2,
-#     cache_num: int = 100,
-#     cache_num_val_all: bool = True
-# ) -> DataLoader:
-#     """
-#     Trả về DataLoader phù hợp cho train/val sử dụng SmartCacheDataset từ MONAI.
-    
-#     Args:
-#         data_dicts (list[dict]): Danh sách dict chứa thông tin ảnh.
-#         spatial_size (Sequence[int] | int): Kích thước resize ảnh đầu vào.
-#         batch_size (int): Batch size.
-#         is_train (bool): Chế độ train hay val.
-#         num_workers (int): Số workers cho DataLoader.
-#         cache_num (int): Số lượng ảnh cache trong RAM.
-#         cache_num_val_all (bool): Nếu val, có cache toàn bộ hay không.
-    
-#     Returns:
-#         DataLoader: DataLoader đã sẵn sàng dùng cho train hoặc val.
-#     """
-#     transforms = get_transforms(spatial_size=spatial_size, is_train=is_train)
-
-#     if is_train:
-#         # DDP: phân chia dữ liệu theo rank
-#         if dist.is_available() and dist.is_initialized():
-#             rank = dist.get_rank()
-#             world_size = dist.get_world_size()
-#         else:
-#             rank = 0
-#             world_size = 1
-
-#         partitioned = partition_dataset(
-#             data=data_dicts,
-#             num_partitions=world_size,
-#             shuffle=True,
-#             even_divisible=True
-#         )
-#         my_data = partitioned[rank]
-
-#         dataset = SmartCacheDataset(
-#             data=my_data,
-#             transform=transforms,
-#             cache_num=min(cache_num, len(my_data)),
-#             replace_rate=0.1
-#         )
-#         shuffle = True
-#     else:
-#         if cache_num_val_all:
-#             dataset = SmartCacheDataset(
-#                 data=data_dicts,
-#                 transform=transforms,
-#                 cache_num=len(data_dicts),
-#                 replace_rate=1.0
-#             )
-#         else:
-#             dataset = SmartCacheDataset(
-#                 data=data_dicts,
-#                 transform=transforms,
-#                 cache_num=min(cache_num, len(data_dicts)),
-#                 replace_rate=1.0
-#             )
-#         shuffle = False
-
-#     return DataLoader(
-#         dataset,
-#         batch_size=batch_size,
-#         shuffle=shuffle,
-#         num_workers=num_workers,
-#         pin_memory=True,
-#         drop_last=is_train
-#     )
-
-# def get_dataloader(data_dicts, batch_size=4, is_train=True, spatial_size=(128, 128, 128), num_workers=2, cache_num=100): 
-#     transforms = get_transforms(spatial_size=spatial_size, is_train=is_train)
-#     dataset = CacheDataset(data_dicts, transform=transforms, num_workers=num_workers)
-#     return DataLoader(
-#         dataset,
-#         batch_size=batch_size,
-#         num_workers=num_workers,
-#         drop_last=is_train
-#     )
-
-# def get_dataloader(data_dicts:str, spatial_size:Sequence[int]|int, batch_size:int, is_train=True, 
-#                    num_workers:int=2, cache_num:int=100, cache_num_val_all:bool=True) -> None: 
-    
-#     transforms = get_transforms(spatial_size=spatial_size, is_train=is_train)
-    
-#     if is_train:
-#         # Tự động lấy rank GPU nếu đang chạy DDP
-#         if dist.is_available() and dist.is_initialized():
-#             rank = dist.get_rank()
-#             world_size = dist.get_world_size()
-#         else:
-#             rank = 0
-#             world_size = 1
-
-#         # Chia dữ liệu train theo số GPU
-#         partitioned = partition_dataset(
-#             data=data_dicts,
-#             num_partitions=world_size,
-#             shuffle=True,
-#             even_divisible=True
-#         )
-#         my_data = partitioned[rank]
-
-#         dataset = SmartCacheDataset(
-#             data=my_data,
-#             transform=transforms,
-#             cache_num=min(cache_num, len(my_data)),
-#             replace_rate=0.1
-#         )
-#         shuffle = True
-#     else:
-#         # Validation không cần chia GPU
-#         if cache_num_val_all:
-#             dataset = SmartCacheDataset(
-#             data=data_dicts,
-#             transform=transforms,
-#             cache_num=len(data_dicts),
-#             replace_rate=1.0
-#         )
-#         else:
-#             dataset = SmartCacheDataset(
-#                 data=data_dicts,
-#                 transform=transforms,
-#                 cache_num=min(cache_num, len(data_dicts)),
-#                 replace_rate=1.0
-#             )
-#         shuffle = False
-
-#     return DataLoader(
-#         dataset,
-#         batch_size=batch_size,
-#         shuffle=shuffle,
-#         num_workers=num_workers,
-#         pin_memory=True,
-#         drop_last=is_train
-#     )
-
 
 
 # if __name__ == "__main__":
