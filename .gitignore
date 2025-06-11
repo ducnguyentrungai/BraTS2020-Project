@@ -1,7 +1,11 @@
-# Ignore PNG images
+# Image formats
 *.png
 
-# Ignore logs, temp, and shell scripts
+# Data formats
+*.nii
+*.nii.gz
+
+# Log & temp files
 *.log
 *.tmp
 *.bak
@@ -10,34 +14,34 @@
 *.json
 *.zip
 *.tar.gz
-*.nii
-*.nii.gz
+*.csv
 
-# Ignore Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-
-# Ignore Python cache
+# Python
 __pycache__/
 *.pyc
 
-# Ignore VS Code settings
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs
 .vscode/
 
-# Ignore system files (macOS & Windows)
+# System
 .DS_Store
 Thumbs.db
 
-# Ignore custom folders (adjust as needed)
-job_run/
-logs/
-
-# Model checkpoints (deep learning)
+# DL outputs
 *.h5
 *.pth
 *.ckpt
 *.local
 
-# Data exports
-*.csv
-*.tsv
+# Specific log/output folders
+logs/
+job_run/
+lightning_logs/
+checkpoints/
+wandb/
+
+# Prevent heavy file from lightning logs
+**/lightning_logs/**/hparams.yaml

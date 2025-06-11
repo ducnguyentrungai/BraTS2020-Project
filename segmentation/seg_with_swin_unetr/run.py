@@ -63,7 +63,7 @@ def auto_select_gpus(n=3, threshold_mem_mib=10000, threshold_util=55):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/data/train_flair_t1_t1ce_t2'
-    batch_size = 4
+    batch_size = 2
     spatial_size = (128, 128, 128)
     num_classes = 4
     in_channels = 4
