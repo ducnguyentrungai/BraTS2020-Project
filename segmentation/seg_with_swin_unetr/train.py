@@ -17,7 +17,7 @@ def auto_select_gpus(n=3, threshold_mem_mb=800, threshold_util=10):
             mem_info = nvmlDeviceGetMemoryInfo(handle)
             util_info = nvmlDeviceGetUtilizationRates(handle)
 
-            mem_used_mb = mem_info.used // 1024**2
+            mem_used_mb = int(mem_info.used // 1024**2)
             gpu_util = util_info.gpu
 
             if mem_used_mb < threshold_mem_mb and gpu_util < threshold_util:

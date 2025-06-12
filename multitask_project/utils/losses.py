@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from monai.losses import DiceLoss
 
-
 class MultiTaskLoss(nn.Module):
     """
     Multi-task loss function combining segmentation and classification losses.
