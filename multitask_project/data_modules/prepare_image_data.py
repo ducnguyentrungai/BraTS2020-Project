@@ -7,14 +7,20 @@ from tqdm import tqdm
 from scipy.ndimage import binary_fill_holes
 from typing import List, Tuple, Union, Optional, Literal
 
-def normalize_zscore(img: np.ndarray) -> np.ndarray:
+
+def normalize_zscore_clipped(img: np.ndarray, clip_range=(-5, 5), rescale_to_01=False) -> np.ndarray:
     img = np.nan_to_num(img).astype(np.float32)
     mask = img > 0
     if np.any(mask):
         mean = img[mask].mean()
         std = img[mask].std()
-        img[mask] = (img[mask] - mean) / (std + 1e-8)
+        z = (img[mask] - mean) / (std + 1e-8)
+        z = np.clip(z, *clip_range)  # Giới hạn giá trị
+        if rescale_to_01:
+            z = (z - clip_range[0]) / (clip_range[1] - clip_range[0])
+        img[mask] = z
     return img
+
 
 def normalize_minmax(img: np.ndarray, eps: float = 1e-8) -> np.ndarray:
     """
@@ -124,7 +130,6 @@ def pad_to_shape(img: np.ndarray, target_shape: Tuple[int, int, int], label: np.
 
     return img_out
 
-
 def get_max_existing_index(images_path: str) -> int:
     max_index = -1
     if os.path.exists(images_path):
@@ -139,6 +144,7 @@ def prepare_data(
     out_path: str,
     images_stack: List[str],
     target_shape: Union[Tuple[int, int, int], None] = None,
+    auto_crop: bool=True | False,
     dim: int = -1,
     scale: Optional[Literal['z-score', 'min-max']] = 'min-max',
     margin:int= 32,
@@ -195,24 +201,26 @@ def prepare_data(
             raise ValueError("scale must be 'min-max', 'z-score' or None")
         elif scale.lower() == 'z-score':
             for c in range(stacked.shape[-1]):
-                stacked[..., c] = normalize_zscore(stacked[..., c])
+                stacked[..., c] = normalize_zscore_clipped(stacked[..., c])
         elif scale.lower() == 'min-max':
             for c in range(stacked.shape[-1]):
                 stacked[..., c] = normalize_minmax(stacked[..., c])
         else: 
             pass
-
-        stacked, label, bbox = smart_crop_brats(stacked, label, margin=margin)
         
-        if label is not None:
-                label[label == 4] = 3
-        
-        if target_shape is not None: 
-            stacked = pad_to_shape(stacked, target_shape, label)
+        if auto_crop: 
+            stacked, label, bbox = smart_crop_brats(stacked, label, margin=margin)
             if label is not None:
-                label = pad_to_shape(label, target_shape, label)
+                    label[label == 4] = 3
             
-
+            if target_shape is not None: 
+                stacked = pad_to_shape(stacked, target_shape, label)
+                if label is not None:
+                    label = pad_to_shape(label, target_shape, label)
+        else:
+              if label is not None:
+                    label[label == 4] = 3
+            
         nib.save(nib.Nifti1Image(stacked, affine), os.path.join(images_path, f"image_{patient_id}.nii.gz"))
         if label is not None:
             nib.save(nib.Nifti1Image(label, affine), os.path.join(labels_path, f"label_{patient_id}.nii.gz"))
