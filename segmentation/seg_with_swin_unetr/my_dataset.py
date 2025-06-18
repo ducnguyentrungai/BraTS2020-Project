@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from pytorch_lightning import LightningDataModule
 from monai.data import CacheDataset, list_data_collate, partition_dataset
 from monai.transforms import Compose
-
+from sklearn.model_selection import train_test_split
 def is_rank_zero():
     if dist.is_available() and dist.is_initialized():
         return dist.get_rank() == 0
@@ -54,14 +54,16 @@ class BratsDataModule(LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         all_cases = sorted(glob.glob(os.path.join(self.data_dir, "BraTS2021_*")))
         rank_zero_print(f"Found {len(all_cases)} cases.")
-
-        # Chia train/val (val cũng là test luôn)
-        num_train = int(len(all_cases) * self.train_percent)
-        train_cases = all_cases[:num_train]
-        val_cases = all_cases[num_train:]
+        
+        # # Chia train/val (val cũng là test luôn)
+        # num_train = int(len(all_cases) * self.train_percent)
+        # train_cases = all_cases[:num_train]
+        # val_cases = all_cases[num_train:]
+        
         # train_cases = all_cases[:8]
         # val_cases = all_cases[8:12]
 
+        train_cases, val_cases = train_test_split(all_cases, train_size=self.train_percent, random_state=42, shuffle=True)
         train_dicts = create_data_dicts(train_cases, self.modalities)
         val_dicts = create_data_dicts(val_cases, self.modalities)
 

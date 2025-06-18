@@ -7,11 +7,12 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import CSVLogger
 from pytorch_lightning.strategies import DDPStrategy
 from monai.networks.nets import SwinUNETR
-from monai.losses import DiceFocalLoss
+from monai.losses import DiceFocalLoss, DiceLoss
 from torch.optim import AdamW
 from lightning_module import LitSegSwinUNETR
 from my_dataset import BratsDataModule
 from my_transform import get_transforms
+from training_time import TrainingTimerCallback
 from pynvml import *
 
 # ==== Đảm bảo thư viện phụ thuộc nằm đúng trong sys.path ====
@@ -73,11 +74,11 @@ def auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/BraTS2021'
-    batch_size = 4
+    batch_size = 2
     spatial_size = (128, 128, 128)
     num_classes = 4
     in_channels = 4
-    root_dir = "swin_unetr_v2_new_batch4"
+    root_dir = "swin_unetr_v2_new_batch2_diceloss2"
     ckpt_dir = os.path.join(root_dir, "checkpoints")
     log_dir = os.path.join(root_dir, "logs")
 
@@ -98,7 +99,7 @@ def train():
         data_dir=data_dir,
         spatial_size=spatial_size,
         batch_size=batch_size,
-        num_workers=4,
+        num_workers=2,
         train_percent=0.9,
         transform_fn=lambda is_train: get_transforms(spatial_size=spatial_size, is_train=is_train)
     )
@@ -115,13 +116,15 @@ def train():
     )
 
     # ==== Loss & Lightning Module ====
-    loss_fn = DiceFocalLoss(to_onehot_y=True, softmax=True, lambda_dice=1.0, lambda_focal=1.0)
+    # loss_fn = DiceFocalLoss(to_onehot_y=True, softmax=True, lambda_dice=1.0, lambda_focal=1.0)
+    loss_fn = DiceLoss(to_onehot_y=True, softmax=True, include_background=False)
 
     lightning_model = LitSegSwinUNETR(
         model=model,
         loss_fn=loss_fn,
         optim_class=AdamW,
-        lr=2e-4,
+        lr=1e-4,
+        # lr=2e-4,
         num_classes=num_classes,
         include_background=False,
         out_path=log_dir
@@ -138,6 +141,7 @@ def train():
     )
 
     csv_logger = CSVLogger(save_dir=log_dir, name="swin_unetr_v2_logs")
+    training_timer_cb = TrainingTimerCallback(save_path=os.path.join(log_dir, "training_time.txt"))
 
     # ==== Trainer ====
     trainer = Trainer(
@@ -147,14 +151,15 @@ def train():
         strategy=strategy,
         precision="16-mixed",  # Mixed precision
         accumulate_grad_batches=4,
-        callbacks=[checkpoint_cb],
+        callbacks=[checkpoint_cb, training_timer_cb],
         logger=csv_logger,
         log_every_n_steps=10,
         default_root_dir=root_dir
     )
 
     # ==== Load weights từ checkpoint như pretrain ====
-    checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new/checkpoints/best_model-epoch=116-val_dice=0.8749.ckpt"
+    # checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new/checkpoints/best_model-epoch=116-val_dice=0.8749.ckpt"
+    checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch4/checkpoints/best_model-epoch=09-val_dice=0.8846.ckpt"
     state_dict = torch.load(checkpoint_path, map_location="cpu")["state_dict"]
     missing, unexpected = lightning_model.load_state_dict(state_dict, strict=False)
     if missing:

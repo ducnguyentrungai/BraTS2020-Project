@@ -16,9 +16,9 @@ class MultiTaskLoss(nn.Module):
         - loss_weight: balancing coefficient for classification loss
     """
     def __init__(self,
-                 loss_seg: nn.Module = None,
-                 loss_cls: nn.Module = None,
-                 loss_weight: float = 1.0):
+                loss_seg: nn.Module = None,
+                loss_cls: nn.Module = None,
+                loss_weight: float = 1.0):
         super().__init__()
 
         # Default segmentation loss: Dice + CrossEntropy (for multi-class seg)
@@ -56,3 +56,5 @@ class MultiTaskLoss(nn.Module):
             "loss_seg": loss_seg,
             "loss_cls": loss_cls
         }
+
+

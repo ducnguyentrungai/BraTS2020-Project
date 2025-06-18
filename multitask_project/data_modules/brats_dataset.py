@@ -124,3 +124,43 @@ class BratsDataModule(LightningDataModule):
             collate_fn=list_data_collate,
         )
 
+
+def main():
+    from transforms.transform_data import get_multitask_transforms, compute_minmax_stats
+    # ✅ Đường dẫn tới file thống kê csv
+    stats_path = "/work/cuc.buithi/brats_challenge/code/multitask_project/data/suvivaldays_info.csv"
+
+    # ✅ Tính thống kê min-max cho tabular features
+    tabular_stats = compute_minmax_stats(stats_path)
+
+    # ✅ Truyền transform đúng chuẩn multitask
+    transform_fn = lambda is_train: get_multitask_transforms(
+        spatial_size=(128, 128, 128),
+        is_train=is_train,
+        tabular_stats=tabular_stats
+    )
+
+    # ✅ Khởi tạo DataModule với transform đúng
+    dm = BratsDataModule(
+        data_dir="/work/cuc.buithi/brats_challenge/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData",
+        table_path=stats_path,
+        batch_size=2,
+        num_workers=2,
+        transform_fn=transform_fn,
+    )
+
+    dm.setup("fit")
+    batch = next(iter(dm.train_dataloader()))
+
+    print("✅ Batch keys:", batch.keys())
+    print("🔹 Image shape:", batch['image'].shape)
+    print("🔹 Label shape:", batch['label'].shape)
+    print("🔹 Tabular shape:", batch['tabular'].shape)
+    print("🔹 Tabular[0] sample:", batch['tabular'][0])
+    print("🔹 Class label:", batch['label_class'])
+
+
+if __name__ == "__main__":
+    main()
+
+
