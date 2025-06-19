@@ -14,6 +14,7 @@ class LitMultiTaskModule(LightningModule):
         weight_decay: float = 1e-5,
         num_seg_classes: int = 4,
         include_background: bool = False,
+        seg_ckpt_path: str = None
     ):
         super().__init__()
         self.model = model
@@ -21,8 +22,11 @@ class LitMultiTaskModule(LightningModule):
         self.lr = lr
         self.weight_decay = weight_decay
 
-        # Không hard-code num_classes và include_background nữa
         self.seg_metric = Metric(num_classes=num_seg_classes, include_background=include_background)
+
+        # Load pretrained segmentation nếu có
+        if seg_ckpt_path is not None:
+            self.model.load_pretrained_segmentation(seg_ckpt_path)
 
     def forward(self, image, tabular):
         return self.model(image, tabular)

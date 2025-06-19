@@ -1,7 +1,7 @@
 conda deactivate#!/bin/bash
 
 srun --pty \
-    --job-name=brats-seg \
+    --job-name=brats \
     --partition=dgx-small  \
     --account=ddt_acc23 \
     --time=24:00:00 \

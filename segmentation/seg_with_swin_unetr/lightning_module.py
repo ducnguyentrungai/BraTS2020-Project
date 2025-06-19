@@ -92,7 +92,7 @@ class LitSegSwinUNETR(pl.LightningModule):
 
         pred = yhat[0].argmax(dim=0)  # [H, W, D]
 
-        mid = image.shape[-1] // 2
+        mid = image.shape[-1] // 2 + 5
         img_stack = image[:, :, :, mid].cpu().numpy()  # shape: (4, H, W)
         stacked_input = [img_stack[i] for i in range(4)]  # T1, T1ce, T2, FLAIR
 

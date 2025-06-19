@@ -1,6 +1,8 @@
 from data_modules.brats_datamodule import BratsDataModule
 from models.multitask_model import MultiModalMultiTaskModel
 from utils.losses import MultiTaskLoss
+from monai.losses import DiceLoss
+from torch.nn import CrossEntropyLoss
 from lightning.lit_multitask_module import LitMultiTaskModule 
 
 import os
@@ -58,7 +60,7 @@ def train():
     image_dir = '/work/cuc.buithi/brats_challenge/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData'
     table_path = "/work/cuc.buithi/brats_challenge/code/multitask_project/data/suvivaldays_info.csv"
 
-    batch_size = 2
+    batch_size = 1
     spatial_size = (128, 128, 128)
     num_seg_classes = 4
     num_cls_classes = 3
@@ -73,9 +75,11 @@ def train():
     selected_gpus = auto_select_gpus(n=2)
     if selected_gpus:
         os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, selected_gpus))
+        rank_zero_print(f"✅ Selected GPUs: {selected_gpus}")
         accelerator = "gpu"
         devices = len(selected_gpus)
     else:
+        rank_zero_print("⚠️ No suitable GPU found. Using CPU.")
         accelerator = "cpu"
         devices = 1
 
@@ -88,7 +92,7 @@ def train():
 
     # Truyền transform đúng chuẩn multitask
     transform_fn = lambda is_train: get_multitask_transforms(
-        spatial_size=(128, 128, 128),
+        spatial_size= spatial_size,
         is_train=is_train,
         tabular_stats=tabular_stats
     )
@@ -100,38 +104,46 @@ def train():
         batch_size=batch_size,
         num_workers=2,
         transform_fn=transform_fn,
-    )
-
-    # === Model ===
-    model = MultiModalMultiTaskModel(
-        img_size=spatial_size,
-        in_channels=in_channels,
-        seg_classes=num_seg_classes,
-        cls_classes=num_cls_classes,
-        tabular_dim=10,
-        feature_size=48,
-        hidden_dim=128,
-        use_v2=True,
-        norm_name='instance'
+        train_percent=0.8
     )
     
+    model = MultiModalMultiTaskModel(
+    img_size=spatial_size,
+    in_channels=in_channels,
+    seg_classes=num_seg_classes,
+    cls_classes=num_cls_classes,
+    tabular_dim=10,
+    feature_size=48,
+    hidden_dim=128,
+    use_v2=True,
+    norm_name='batch'
+    )
+    # ==== Loss ====
+    loss_fn = MultiTaskLoss(
+        loss_seg= DiceLoss(to_onehot_y=True, softmax=True),
+        loss_cls=CrossEntropyLoss(),
+        loss_weight=1.0
+    )
+    # Load pretrained segmentation weights
+    seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch2_diceloss/checkpoints/best_model-epoch=46-val_dice=0.8828.ckpt"
     lit_model = LitMultiTaskModule(
         model=model,
-        loss_fn=MultiTaskLoss(loss_weight=1.0),
+        loss_fn=loss_fn,
         lr=1e-4,
         num_seg_classes=num_seg_classes,
-        include_background=False              
+        include_background=False,
+        seg_ckpt_path=seg_ckpt_path      
     )
 
     # === Logger + Checkpoint ===
     logger = CSVLogger(save_dir=logs_dir, name="multitask")
     checkpoint = ModelCheckpoint(
         dirpath=ckpt_dir,
-        monitor="val/dice",
+        monitor="val_dice",
         mode="max",
         save_top_k=1,
         save_last=True,
-        filename="epoch={epoch}-valdice={val/dice:.4f}"
+        filename="epoch={epoch}-valdice={val_dice:.4f}"
     )
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
 
@@ -140,13 +152,16 @@ def train():
         accelerator=accelerator,
         devices=devices,
         strategy=strategy,
-        max_epochs=500,
+        max_epochs=100,
         logger=logger,
         callbacks=[checkpoint, lr_monitor],
         log_every_n_steps=5,
         check_val_every_n_epoch=1,
         deterministic=True,
+        precision="16-mixed",
+        accumulate_grad_batches=8,
     )
+
 
     trainer.fit(lit_model, datamodule=data_module)
 

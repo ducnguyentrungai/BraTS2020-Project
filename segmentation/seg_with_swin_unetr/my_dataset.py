@@ -36,9 +36,9 @@ class BratsDataModule(LightningDataModule):
         self,
         data_dir: str,
         spatial_size: Union[Sequence[int], int] = (128, 128, 128),
-        batch_size: int = 4,
+        batch_size: int = 2,
         num_workers: int = 2,
-        train_percent: float = 0.9,
+        train_percent: float = 0.825,
         modalities: List[str] = ['t1', 't1ce', 't2', 'flair'],
         transform_fn: Optional[Callable[[bool], Compose]] = None,
     ):
@@ -55,17 +55,18 @@ class BratsDataModule(LightningDataModule):
         all_cases = sorted(glob.glob(os.path.join(self.data_dir, "BraTS2021_*")))
         rank_zero_print(f"Found {len(all_cases)} cases.")
         
-        # # Chia train/val (val cũng là test luôn)
+        # Chia train/val (val cũng là test luôn)
+        ## Cach 1
         # num_train = int(len(all_cases) * self.train_percent)
         # train_cases = all_cases[:num_train]
         # val_cases = all_cases[num_train:]
         
-        # train_cases = all_cases[:8]
-        # val_cases = all_cases[8:12]
-
+        # Cach 2
         train_cases, val_cases = train_test_split(all_cases, train_size=self.train_percent, random_state=42, shuffle=True)
         train_dicts = create_data_dicts(train_cases, self.modalities)
         val_dicts = create_data_dicts(val_cases, self.modalities)
+        train_dicts = train_dicts[:8]
+        val_dicts = val_dicts[:4]
 
         # Chia dữ liệu giữa các GPU nếu dùng DDP
         if dist.is_available() and dist.is_initialized():
@@ -86,6 +87,7 @@ class BratsDataModule(LightningDataModule):
                 cache_rate=1.0,
                 num_workers=self.num_workers,
             )
+            
             self.val_dataset = CacheDataset(
                 data=val_dicts,
                 transform=self.transform_fn(is_train=False),
@@ -131,3 +133,5 @@ class BratsDataModule(LightningDataModule):
             drop_last=False,
             collate_fn=list_data_collate,
         )
+        
+        

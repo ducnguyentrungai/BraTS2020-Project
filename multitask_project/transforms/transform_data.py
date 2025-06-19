@@ -109,7 +109,7 @@ def get_multitask_transforms(
         ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
         Lambdad(keys=["image"], func=zscore_clip),
         Lambdad(keys="label", func=remap_label),
-        CropForegroundd(keys=["image", "label"], source_key="image"),
+        CropForegroundd(keys=["image", "label"], source_key="image", return_coords=False),
     ]
 
     if is_train:
@@ -122,26 +122,22 @@ def get_multitask_transforms(
                 pos=1, neg=1, num_samples=1,
                 image_key="image", image_threshold=0,
             ),
-            RandFlipd(keys=["image", "label"], spatial_axis=[0], prob=0.5),
-            RandFlipd(keys=["image", "label"], spatial_axis=[1], prob=0.5),
-            RandFlipd(keys=["image", "label"], spatial_axis=[2], prob=0.5),
-            RandRotate90d(keys=["image", "label"], prob=0.5, max_k=3),
-            RandAffined(
-                keys=["image", "label"],
-                mode=("bilinear", "nearest"),
-                prob=0.3, spatial_size=spatial_size,
-                rotate_range=(0.1, 0.1, 0.1),
-                scale_range=(0.1, 0.1, 0.1),
-                translate_range=(10, 10, 10),
-                padding_mode="border"
-            ),
-            RandShiftIntensityd(keys=["image"], offsets=0.1, prob=0.5),
-            RandScaleIntensityd(keys=["image"], factors=0.1, prob=0.5),
-            RandAdjustContrastd(keys=["image"], prob=0.3, gamma=(0.7, 1.5)),
-            RandGaussianNoised(keys=["image"], prob=0.3, mean=0.0, std=0.1),
-            RandGaussianSmoothd(keys=["image"], prob=0.2, sigma_x=(1, 2)),
-            Rand3DElasticd(keys=["image", "label"], sigma_range=(5, 8), magnitude_range=(50, 100), prob=0.2),
+            # RandFlipd(keys=["image", "label"], spatial_axis=[0, 1, 2], prob=0.5),
+            # RandRotate90d(keys=["image", "label"], prob=0.3, max_k=1),
+            # RandAffined(  # chỉ giữ nhẹ
+            #     keys=["image", "label"],
+            #     mode=("bilinear", "nearest"),
+            #     prob=0.1,
+            #     spatial_size=spatial_size,
+            #     rotate_range=(0.05, 0.05, 0.05),
+            #     scale_range=(0.05, 0.05, 0.05),
+            #     translate_range=(2, 2, 2),
+            #     padding_mode="border"
+            # ),
+            # RandScaleIntensityd(keys=["image"], factors=0.05, prob=0.3),
+            # RandGaussianNoised(keys=["image"], prob=0.1, mean=0.0, std=0.03),
         ]
+
     else:
         transforms += [
             SpatialPadd(keys=["image", "label"], spatial_size=spatial_size),
@@ -154,7 +150,6 @@ def get_multitask_transforms(
         Resized(keys=["image", "label"], spatial_size=spatial_size),
     ]
 
-    # ✅ Bổ sung bước xử lý tabular + label_class
     if tabular_stats is not None:
         transforms += [
             TabularToTensor(keys=["tabular"], stats=tabular_stats),
@@ -163,11 +158,3 @@ def get_multitask_transforms(
     return Compose(transforms)
 
 
-
-# if __name__ == "__main__":
-#     data = torch.randn(1, 1, 96, 96, 96)
-#     dicts = {'image': data, 'label': data}
-#     lambd = Lambdad(keys=['image'], func=zscore_clip)
-#     out = lambd(dicts)
-#     print(out['image'].shape)
-#     print(f"min: {out['image'].min().item():.4f}, max: {out['image'].max().item():.4f}")

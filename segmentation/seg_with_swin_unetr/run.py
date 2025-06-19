@@ -11,7 +11,7 @@ from monai.losses import DiceFocalLoss, DiceLoss
 from torch.optim import AdamW
 from lightning_module import LitSegSwinUNETR
 from my_dataset import BratsDataModule
-from my_transform import get_transforms
+from my_transform import get_transforms, get_transforms_full_volume
 from training_time import TrainingTimerCallback
 from pynvml import *
 
@@ -76,9 +76,10 @@ def train():
     data_dir = '/work/cuc.buithi/brats_challenge/BraTS2021'
     batch_size = 2
     spatial_size = (128, 128, 128)
+    # spatial_size = (96, 96, 96)
     num_classes = 4
     in_channels = 4
-    root_dir = "swin_unetr_v2_new_batch2_diceloss2"
+    root_dir = "swin_unetr_batch3"
     ckpt_dir = os.path.join(root_dir, "checkpoints")
     log_dir = os.path.join(root_dir, "logs")
 
@@ -100,19 +101,19 @@ def train():
         spatial_size=spatial_size,
         batch_size=batch_size,
         num_workers=2,
-        train_percent=0.9,
-        transform_fn=lambda is_train: get_transforms(spatial_size=spatial_size, is_train=is_train)
+        train_percent=0.825,
+        transform_fn=lambda is_train: get_transforms_full_volume(spatial_size=spatial_size, is_train=is_train)
     )
 
     # ==== Model ====
     model = SwinUNETR(
-        img_size=spatial_size,
+        # img_size=spatial_size,
         in_channels=in_channels,
         out_channels=num_classes,
         feature_size=48,
         norm_name='batch',
         use_checkpoint=True,
-        use_v2=True
+        use_v2=True,
     )
 
     # ==== Loss & Lightning Module ====
@@ -145,7 +146,7 @@ def train():
 
     # ==== Trainer ====
     trainer = Trainer(
-        max_epochs=50,
+        max_epochs=300,
         accelerator=accelerator,
         devices=devices,
         strategy=strategy,
@@ -159,14 +160,17 @@ def train():
 
     # ==== Load weights từ checkpoint như pretrain ====
     # checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new/checkpoints/best_model-epoch=116-val_dice=0.8749.ckpt"
-    checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch4/checkpoints/best_model-epoch=09-val_dice=0.8846.ckpt"
-    state_dict = torch.load(checkpoint_path, map_location="cpu")["state_dict"]
+    # checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch4/checkpoints/best_model-epoch=09-val_dice=0.8846.ckpt"
+    # state_dict = torch.load(checkpoint_path, map_location="cpu")["state_dict"]    
+    
+    checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/pretrained/ssl_pretrained_weights.pth"
+    state_dict = torch.load(checkpoint_path, map_location="cpu")
     missing, unexpected = lightning_model.load_state_dict(state_dict, strict=False)
     if missing:
         print("⚠️ Missing keys:", missing)
     if unexpected:
         print("⚠️ Unexpected keys:", unexpected)
-
+    
     # ==== Training ====
     trainer.fit(lightning_model, datamodule=datamodule)
 
