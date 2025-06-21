@@ -85,14 +85,14 @@ class LitSegSwinUNETR(pl.LightningModule):
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
 
     def _visualize_prediction(self, batch, yhat, epoch):
-        image = batch["image"][0]     # Tensor [C, H, W, D]
-        label = batch["label"][0]     # Tensor [1, H, W, D] hoặc [H, W, D]
+        image = batch["image"][1]     # Tensor [C, H, W, D]
+        label = batch["label"][1]     # Tensor [1, H, W, D] hoặc [H, W, D]
         if label.ndim == 4 and label.shape[0] == 1:
             label = label.squeeze(0)
 
-        pred = yhat[0].argmax(dim=0)  # [H, W, D]
+        pred = yhat[1].argmax(dim=0)  # [H, W, D]
 
-        mid = image.shape[-1] // 2 + 5
+        mid = image.shape[-1] // 2
         img_stack = image[:, :, :, mid].cpu().numpy()  # shape: (4, H, W)
         stacked_input = [img_stack[i] for i in range(4)]  # T1, T1ce, T2, FLAIR
 

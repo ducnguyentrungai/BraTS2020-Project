@@ -5,7 +5,7 @@ from monai.transforms import (
     RandGaussianSmoothd, RandShiftIntensityd, RandScaleIntensityd,
     RandAdjustContrastd, Rand3DElasticd, CenterSpatialCropd,
     ToTensord, Resized, Lambdad, ThresholdIntensityd, CastToTyped, ResizeWithPadOrCrop,
-    SpatialCropd, RandSpatialCropd, RandZoomd, RandBiasFieldd, RandGridDistortiond,
+    SpatialCropd, RandSpatialCropd, RandZoomd, RandBiasFieldd, RandGridDistortiond, ConcatItemsd,
     RandCoarseDropoutd, RandHistogramShiftd, EnsureTyped, DeleteItemsd, NormalizeIntensityd
     
 )
@@ -110,6 +110,7 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
     transforms = [
         LoadImaged(keys=["image", "label"]),
         EnsureChannelFirstd(keys=["image", "label"]),
+        # ConcatItemsd(keys="image", name="image", dim=0),
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
         ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
@@ -120,7 +121,7 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
 
     if is_train:
         transforms += [
-            SpatialPadd(keys=["image", "label"], spatial_size=(160, 160, 160)),
+            SpatialPadd(keys=["image", "label"], spatial_size=spatial_size),
             RandCropByPosNegLabeld(
                 keys=["image", "label"],
                 label_key="label",
@@ -156,13 +157,13 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
         transforms += [
             SpatialPadd(keys=["image", "label"], spatial_size=spatial_size),
             CenterSpatialCropd(keys=["image", "label"], roi_size=spatial_size),
-            SpatialCropd(keys=["image", "label"], roi_size=spatial_size),
         ]
 
     transforms += [
         CastToTyped(keys=["label"], dtype=np.uint8),
-        ToTensord(keys=["image", "label"]),
+        DeleteItemsd(keys=["foreground_start_coord", "foreground_end_coord"]),
         Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
+        ToTensord(keys=["image", "label"]),
     ]
 
     return Compose(transforms)

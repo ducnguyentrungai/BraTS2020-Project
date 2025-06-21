@@ -1,0 +1,37 @@
+nohup: ignoring input
+Using 16bit Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+You are using a CUDA device ('NVIDIA A100-SXM4-40GB') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+GPU 0: Used 624 MiB, Util 0%
+GPU 1: Used 624 MiB, Util 0%
+GPU 2: Used 624 MiB, Util 0%
+GPU 3: Used 34703 MiB, Util 29%
+GPU 4: Used 624 MiB, Util 0%
+GPU 5: Used 35267 MiB, Util 0%
+GPU 6: Used 24477 MiB, Util 82%
+GPU 7: Used 23859 MiB, Util 92%
+✅ Auto-selected GPUs: [0]
+Found 1251 cases.
+Traceback (most recent call last):
+  File "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/run.py", line 182, in <module>
+    train()
+  File "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/run.py", line 178, in train
+    trainer.fit(lightning_model, datamodule=datamodule)
+  File "/home/cuc.buithi/miniconda3/envs/seg-env/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 561, in fit
+    call._call_and_handle_interrupt(
+  File "/home/cuc.buithi/miniconda3/envs/seg-env/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 48, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+  File "/home/cuc.buithi/miniconda3/envs/seg-env/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 599, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/home/cuc.buithi/miniconda3/envs/seg-env/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 974, in _run
+    call._call_setup_hook(self)  # allow user to set up LightningModule in accelerator environment
+  File "/home/cuc.buithi/miniconda3/envs/seg-env/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 107, in _call_setup_hook
+    _call_lightning_datamodule_hook(trainer, "setup", stage=fn)
+  File "/home/cuc.buithi/miniconda3/envs/seg-env/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 198, in _call_lightning_datamodule_hook
+    return fn(*args, **kwargs)
+  File "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/tu_my_dataset.py", line 84, in setup
+    self.train_dataset = PersistentDataset(
+TypeError: PersistentDataset.__init__() got an unexpected keyword argument 'cache_rate'
