@@ -77,17 +77,18 @@ def auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/BraTS2021'
-    batch_size = 3
+    # batch_size = 3
+    batch_size = 1
     spatial_size = (128, 128, 128)
     # spatial_size = (96, 96, 96)
     num_classes = 4
     in_channels = 4
-    root_dir = "swin_unetr_batch3"
+    root_dir = "swin_unetr_batch3_1"
     ckpt_dir = os.path.join(root_dir, "checkpoints")
     log_dir = os.path.join(root_dir, "logs")
 
     # ==== Auto GPU selection ====
-    selected_gpus = auto_select_gpus(n=1, threshold_mem_mib=5000, threshold_util=55)
+    selected_gpus = auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55)
     if selected_gpus:
         os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, selected_gpus))
         accelerator = "gpu"
@@ -103,8 +104,8 @@ def train():
         data_dir=data_dir,
         spatial_size=spatial_size,
         batch_size=batch_size,
-        num_workers=2,
-        train_percent=0.83,
+        num_workers=0,
+        train_percent=0.825,
         modalities=['t1', 't1ce', 't2', 'flair'],
         transform_fn=lambda is_train: get_transforms(spatial_size=spatial_size, is_train=is_train)
     )

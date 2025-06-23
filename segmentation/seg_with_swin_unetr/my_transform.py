@@ -6,7 +6,7 @@ from monai.transforms import (
     RandAdjustContrastd, Rand3DElasticd, CenterSpatialCropd,
     ToTensord, Resized, Lambdad, ThresholdIntensityd, CastToTyped, ResizeWithPadOrCrop,
     SpatialCropd, RandSpatialCropd, RandZoomd, RandBiasFieldd, RandGridDistortiond, ConcatItemsd,
-    RandCoarseDropoutd, RandHistogramShiftd, EnsureTyped, DeleteItemsd, NormalizeIntensityd
+    RandCoarseDropoutd, RandHistogramShiftd, EnsureTyped, DeleteItemsd, NormalizeIntensityd, ResizeWithPadOrCropd
     
 )
 from typing import Union, Sequence
@@ -110,7 +110,6 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
     transforms = [
         LoadImaged(keys=["image", "label"]),
         EnsureChannelFirstd(keys=["image", "label"]),
-        # ConcatItemsd(keys="image", name="image", dim=0),
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
         ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
@@ -160,10 +159,14 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
         ]
 
     transforms += [
-        CastToTyped(keys=["label"], dtype=np.uint8),
+        ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
         DeleteItemsd(keys=["foreground_start_coord", "foreground_end_coord"]),
-        Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
-        ToTensord(keys=["image", "label"]),
+        # Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
+        # ToTensord(keys=["image", "label"]),
+        CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
+        Lambdad(keys="image", func=lambda x: (print(f"🧪 image shape: {x.shape}"), x)[1]),
+        Lambdad(keys="label", func=lambda x: (print(f"🧪 label shape: {x.shape}"), x)[1]),
+
     ]
 
     return Compose(transforms)

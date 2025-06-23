@@ -36,7 +36,7 @@ def create_data_dicts(data_dirs: List[str], modalities: List[str], error_json_pa
             data_dicts.append({
                 "image": images,
                 "label": label,
-                "case_id": base
+                # "case_id": base
             })
 
     # Ghi file lỗi
