@@ -26,7 +26,7 @@ class LitMultiTaskModule(LightningModule):
 
         # Load pretrained segmentation nếu có
         if seg_ckpt_path is not None:
-            self.model.load_pretrained_segmentation(seg_ckpt_path)
+           torch.load(seg_ckpt_path, map_location="cpu")["state_dict"]
 
     def forward(self, image, tabular):
         return self.model(image, tabular)
@@ -50,6 +50,24 @@ class LitMultiTaskModule(LightningModule):
         self.log("train_loss_seg", losses["loss_seg"], sync_dist=True)
         self.log("train_loss_cls", losses["loss_cls"], sync_dist=True)
         return losses["loss"]
+    
+    # def training_step(self, batch, batch_idx):
+    #     losses, _, _, _, _ = self.shared_step(batch)
+
+    #     self.log_dict(
+    #         {
+    #             "train/loss": losses["loss"],
+    #             "train/loss_seg": losses["loss_seg"],
+    #             "train/loss_cls": losses["loss_cls"]
+    #         },
+    #         prog_bar=False,
+    #         on_step=True,
+    #         on_epoch=True,
+    #         sync_dist=True
+    #     )
+
+    #     return losses["loss"]
+
 
     def validation_step(self, batch, batch_idx):
         losses, seg_pred, seg_label, cls_pred, cls_label = self.shared_step(batch)
@@ -60,7 +78,7 @@ class LitMultiTaskModule(LightningModule):
 
         # Classification metrics
         y_true = cls_label.cpu().numpy()
-        y_pred = cls_pred.argmax(dim=1).cpu().numpy()
+        y_pred = cls_pred.argmax(dim=1).detach().cpu().numpy()
         acc = accuracy_score(y_true, y_pred)
         prec = precision_score(y_true, y_pred, average="macro", zero_division=0)
         rec = recall_score(y_true, y_pred, average="macro", zero_division=0)
@@ -86,5 +104,53 @@ class LitMultiTaskModule(LightningModule):
             "f1": f1
         }
 
+    # def validation_step(self, batch, batch_idx):
+    #     # Tính loss và dự đoán
+    #     losses, seg_pred, seg_label, cls_pred, cls_label = self.shared_step(batch)
+
+    #     # Segmentation metrics
+    #     dice = self.seg_metric.Dice(seg_pred, seg_label)
+    #     iou = self.seg_metric.IoU(seg_pred, seg_label)
+
+    #     # Classification metrics
+    #     y_true = cls_label.detach().cpu().numpy()
+    #     y_pred = cls_pred.argmax(dim=1).detach().cpu().numpy()
+    #     acc = accuracy_score(y_true, y_pred)
+    #     prec = precision_score(y_true, y_pred, average="macro", zero_division=0)
+    #     rec = recall_score(y_true, y_pred, average="macro", zero_division=0)
+    #     f1 = f1_score(y_true, y_pred, average="macro", zero_division=0)
+
+    #     # Log tất cả metrics phụ (không hiện progress bar)
+    #     self.log_dict(
+    #         {
+    #             "val/loss_seg": losses["loss_seg"],
+    #             "val/loss_cls": losses["loss_cls"],
+    #             "val/seg_iou": iou,
+    #             "val/cls_f1": float(f1),
+    #             "val/cls_prec": float(prec),
+    #             "val/cls_rec": float(rec),
+    #         },
+    #         prog_bar=False,
+    #         on_step=False,
+    #         on_epoch=True,
+    #         sync_dist=True
+    #     )
+
+    #     # Log riêng các metric chính (hiện progress bar)
+    #     self.log("val/loss", losses["loss"], prog_bar=True, on_step=False, on_epoch=True, sync_dist=True)
+    #     self.log("val/seg_dice", dice, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True)
+    #     self.log("val/cls_acc", acc, prog_bar=True, on_step=False, on_epoch=True, sync_dist=True)
+
+    #     return {
+    #         "loss": losses["loss"],
+    #         "dice": dice,
+    #         "iou": iou,
+    #         "acc": acc,
+    #         "prec": prec,
+    #         "rec": rec,
+    #         "f1": f1
+    #     }
+
+        
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)

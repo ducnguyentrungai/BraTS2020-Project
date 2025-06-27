@@ -2,7 +2,7 @@ import os
 import glob
 import pandas as pd
 from typing import List, Union, Optional, Callable
-from monai.data import CacheDataset, list_data_collate, partition_dataset
+from monai.data import CacheDataset, list_data_collate, partition_dataset, pad_list_data_collate
 from torch.utils.data import DataLoader
 import torch.distributed as dist
 from pytorch_lightning import LightningDataModule
@@ -115,12 +115,13 @@ class BratsDataModule(LightningDataModule):
 
     def _shared_eval_dataloader(self):
         return DataLoader(
-            self.val_dataset,
+            self.train_dataset,
             batch_size=self.batch_size,
-            shuffle=False,
+            shuffle=True,
             num_workers=self.num_workers,
             pin_memory=True,
-            drop_last=False,
-            collate_fn=list_data_collate,
+            persistent_workers=True,
+            drop_last=True,
+            collate_fn=pad_list_data_collate,
         )
 

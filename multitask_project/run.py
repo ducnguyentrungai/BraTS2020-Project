@@ -65,9 +65,9 @@ def train():
     num_seg_classes = 4
     num_cls_classes = 3
     in_channels = 4
-    root_dir = 'multitask_logs'
+    root_dir = 'logs'
     ckpt_dir = os.path.join(root_dir, 'checkpoints')
-    logs_dir = os.path.join(root_dir, 'logs')
+    logs_dir = os.path.join(root_dir, 'mul_logs')
 
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(logs_dir, exist_ok=True)
@@ -120,12 +120,12 @@ def train():
     )
     # ==== Loss ====
     loss_fn = MultiTaskLoss(
-        loss_seg= DiceLoss(to_onehot_y=True, softmax=True),
+        loss_seg= DiceLoss(to_onehot_y=True, softmax=True, jaccard=True, include_background=False),
         loss_cls=CrossEntropyLoss(),
         loss_weight=1.0
     )
     # Load pretrained segmentation weights
-    seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch2_diceloss/checkpoints/best_model-epoch=46-val_dice=0.8828.ckpt"
+    seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_batch3/checkpoints/best_model-epoch=07-val_dice=0.8961.ckpt"
     lit_model = LitMultiTaskModule(
         model=model,
         loss_fn=loss_fn,
@@ -161,7 +161,6 @@ def train():
         precision="16-mixed",
         accumulate_grad_batches=8,
     )
-
 
     trainer.fit(lit_model, datamodule=data_module)
 

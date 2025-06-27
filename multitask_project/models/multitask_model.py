@@ -64,7 +64,7 @@ class MultiModalMultiTaskModel(nn.Module):
 
         # Backbone for segmentation
         self.backbone = SwinUNETR(
-            img_size=img_size,
+            # img_size=img_size,
             in_channels=in_channels,
             out_channels=seg_classes,
             feature_size=feature_size,

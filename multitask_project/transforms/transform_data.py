@@ -4,7 +4,8 @@ from monai.transforms import (
     RandFlipd, RandRotate90d, RandAffined, RandGaussianNoised,
     RandGaussianSmoothd, RandShiftIntensityd, RandScaleIntensityd,
     RandAdjustContrastd, Rand3DElasticd, Zoomd, CenterSpatialCropd,
-    ToTensord, Resized, Lambdad, ThresholdIntensityd, CastToTyped, ResizeWithPadOrCrop, MapTransform
+    ToTensord, Resized, Lambdad, ThresholdIntensityd, CastToTyped, ResizeWithPadOrCropd, 
+    MapTransform, DeleteItemsd
 )
 from typing import Union, Sequence, Dict, Optional
 import numpy as np
@@ -81,8 +82,7 @@ def minmax_scale_tabular(tab: dict, stats: Dict[str, Dict[str, float]]) -> torch
         scale(tab["ed_pct"], *stats["ed_pct"].values()),
         scale(tab["et_pct"], *stats["et_pct"].values()),
     ]
-
-    return torch.tensor(features, dtype=torch.float)
+    return torch.tensor(features, dtype=torch.float32)
 
 class TabularToTensor(MapTransform):
     def __init__(self, keys, stats: Dict[str, Dict[str, float]]):
@@ -119,23 +119,32 @@ def get_multitask_transforms(
                 keys=["image", "label"],
                 label_key="label",
                 spatial_size=spatial_size,
-                pos=1, neg=1, num_samples=1,
-                image_key="image", image_threshold=0,
+                pos=1,
+                neg=1,
+                num_samples=1,
+                image_key="image",
+                image_threshold=0
             ),
-            # RandFlipd(keys=["image", "label"], spatial_axis=[0, 1, 2], prob=0.5),
-            # RandRotate90d(keys=["image", "label"], prob=0.3, max_k=1),
-            # RandAffined(  # chỉ giữ nhẹ
-            #     keys=["image", "label"],
-            #     mode=("bilinear", "nearest"),
-            #     prob=0.1,
-            #     spatial_size=spatial_size,
-            #     rotate_range=(0.05, 0.05, 0.05),
-            #     scale_range=(0.05, 0.05, 0.05),
-            #     translate_range=(2, 2, 2),
-            #     padding_mode="border"
-            # ),
-            # RandScaleIntensityd(keys=["image"], factors=0.05, prob=0.3),
-            # RandGaussianNoised(keys=["image"], prob=0.1, mean=0.0, std=0.03),
+            RandFlipd(keys=["image", "label"], spatial_axis=[0], prob=0.5),
+            RandFlipd(keys=["image", "label"], spatial_axis=[1], prob=0.5),
+            RandFlipd(keys=["image", "label"], spatial_axis=[2], prob=0.5),
+            RandRotate90d(keys=["image", "label"], prob=0.5, max_k=3),
+            RandAffined(
+                keys=["image", "label"],
+                mode=("bilinear", "nearest"),
+                prob=0.3,
+                spatial_size=spatial_size,
+                rotate_range=(0.1, 0.1, 0.1),
+                scale_range=(0.1, 0.1, 0.1),
+                translate_range=(10, 10, 10),
+                padding_mode="border"
+            ),
+            RandShiftIntensityd(keys=["image"], offsets=0.1, prob=0.5),
+            RandScaleIntensityd(keys=["image"], factors=0.1, prob=0.5),
+            RandAdjustContrastd(keys=["image"], prob=0.3, gamma=(0.7, 1.5)),
+            RandGaussianNoised(keys=["image"], prob=0.3, mean=0.0, std=0.1),
+            RandGaussianSmoothd(keys=["image"], prob=0.2, sigma_x=(1, 2)),
+            Rand3DElasticd(keys=["image", "label"], sigma_range=(5, 8), magnitude_range=(50, 100), prob=0.2),
         ]
 
     else:
@@ -145,9 +154,11 @@ def get_multitask_transforms(
         ]
 
     transforms += [
-        CastToTyped(keys=["label"], dtype=np.uint8),
+        DeleteItemsd(keys=["foreground_start_coord", "foreground_end_coord"]),
+        ResizeWithPadOrCropd(keys="image", spatial_size=spatial_size),
+        ResizeWithPadOrCropd(keys="label", spatial_size=spatial_size),
+        CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
         ToTensord(keys=["image", "label"]),
-        Resized(keys=["image", "label"], spatial_size=spatial_size),
     ]
 
     if tabular_stats is not None:
