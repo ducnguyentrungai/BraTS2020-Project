@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from monai.losses import DiceLoss
+from monai.losses import DiceLoss, DiceCELoss
 
 class MultiTaskLoss(nn.Module):
     """
@@ -21,8 +21,8 @@ class MultiTaskLoss(nn.Module):
                 loss_weight: float = 1.0):
         super().__init__()
 
-        # Default segmentation loss: Dice + CrossEntropy (for multi-class seg)
-        self.loss_seg = loss_seg if loss_seg is not None else DiceLoss(to_onehot_y=True, softmax=True)
+        # Default segmentation loss: DiceCE + CrossEntropy (for multi-class seg)
+        self.loss_seg = loss_seg if loss_seg is not None else  DiceLoss(to_onehot_y=True, softmax=True, include_background=True)
 
         # Default classification loss: CrossEntropy
         self.loss_cls = loss_cls if loss_cls is not None else nn.CrossEntropyLoss()

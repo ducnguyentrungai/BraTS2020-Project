@@ -30,7 +30,7 @@ class BratsDataModule(LightningDataModule):
                  spatial_size: Union[List[int], int] = (128, 128, 128),
                  batch_size: int = 4,
                  num_workers: int = 2,
-                 train_percent: float = 0.9,
+                 train_percent: float = 0.8,
                  modalities: List[str] = ['t1', 't1ce', 't2', 'flair'],
                  transform_fn: Optional[Callable[[bool], Compose]] = None):
         super().__init__()
@@ -122,6 +122,6 @@ class BratsDataModule(LightningDataModule):
             pin_memory=True,
             persistent_workers=True,
             drop_last=True,
-            collate_fn=pad_list_data_collate,
+            collate_fn=list_data_collate,
         )
 

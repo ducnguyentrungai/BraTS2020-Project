@@ -3,7 +3,7 @@ import sys
 import torch
 import torch.distributed as dist
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint, Timer
 from pytorch_lightning.loggers import CSVLogger
 from pytorch_lightning.strategies import DDPStrategy
 from monai.networks.nets import SwinUNETR
@@ -77,8 +77,8 @@ def auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/BraTS2021'
-    # batch_size = 3
-    batch_size = 1
+    batch_size = 3
+    # batch_size = 1
     spatial_size = (128, 128, 128)
     # spatial_size = (96, 96, 96)
     num_classes = 4
@@ -112,6 +112,7 @@ def train():
 
     # ==== Model ====
     model = SwinUNETR(
+        img_size = spatial_size,
         in_channels=in_channels,
         out_channels=num_classes,
         feature_size=48,
@@ -147,7 +148,10 @@ def train():
     )
 
     csv_logger = CSVLogger(save_dir=log_dir, name="swin_unetr_v2_logs")
-    training_timer_cb = TrainingTimerCallback(save_path=os.path.join(log_dir, "training_time.txt"))
+    # training_timer_cb = TrainingTimerCallback(save_path=os.path.join(log_dir, "training_time.txt"))
+    
+    # === Time ===
+    timer = Timer()
 
     # ==== Trainer ====
     trainer = Trainer(
@@ -157,7 +161,9 @@ def train():
         strategy=strategy,
         precision="16-mixed",
         accumulate_grad_batches=4,
-        callbacks=[checkpoint_cb, training_timer_cb],
+        callbacks=[checkpoint_cb, 
+                #    training_timer_cb,
+                   timer],
         logger=csv_logger,
         log_every_n_steps=10,
         default_root_dir=root_dir
@@ -178,7 +184,11 @@ def train():
     
     # ==== Training ====
     trainer.fit(lightning_model, datamodule=datamodule)
-
+    duration_sec = timer.time_elapsed('train')
+    h = int(duration_sec // 3600)
+    m = int((duration_sec % 3600) // 60)
+    s = int(duration_sec % 60)
+    print(f"Tổng thời gian training: {h} giờ {m} phút {s} giây")
 
 if __name__ == "__main__":
     train()

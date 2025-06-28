@@ -113,7 +113,7 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
         ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
-        Lambdad(keys=["image"], func=zscore_clip),
+        Lambdad(keys="image", func=zscore_clip),
         Lambdad(keys="label", func=remap_label),
         CropForegroundd(keys=["image", "label"], source_key="image"),
     ]
@@ -162,11 +162,8 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
         ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
         DeleteItemsd(keys=["foreground_start_coord", "foreground_end_coord"]),
         # Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
-        # ToTensord(keys=["image", "label"]),
-        CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
-        Lambdad(keys="image", func=lambda x: (print(f"🧪 image shape: {x.shape}"), x)[1]),
-        Lambdad(keys="label", func=lambda x: (print(f"🧪 label shape: {x.shape}"), x)[1]),
-
+        ToTensord(keys=["image", "label"]),
+        # CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
     ]
 
     return Compose(transforms)

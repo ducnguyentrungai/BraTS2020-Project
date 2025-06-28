@@ -1,9 +1,12 @@
 from data_modules.brats_datamodule import BratsDataModule
 from models.multitask_model import MultiModalMultiTaskModel
 from utils.losses import MultiTaskLoss
-from monai.losses import DiceLoss
+from monai.losses import DiceLoss, DiceCELoss
 from torch.nn import CrossEntropyLoss
 from lightning.lit_multitask_module import LitMultiTaskModule 
+from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.callbacks import Timer
+
 
 import os
 import sys
@@ -60,12 +63,15 @@ def train():
     image_dir = '/work/cuc.buithi/brats_challenge/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData'
     table_path = "/work/cuc.buithi/brats_challenge/code/multitask_project/data/suvivaldays_info.csv"
 
-    batch_size = 1
+    batch_size = 4
     spatial_size = (128, 128, 128)
+    # spatial_size = (96, 96, 96)
+    # spatial_size = (112, 112, 112)
     num_seg_classes = 4
     num_cls_classes = 3
     in_channels = 4
-    root_dir = 'logs'
+    root_dir = 'logs/logs_128_bat4'
+    out_path = os.path.join(root_dir, 'images_predict')
     ckpt_dir = os.path.join(root_dir, 'checkpoints')
     logs_dir = os.path.join(root_dir, 'mul_logs')
 
@@ -104,35 +110,46 @@ def train():
         batch_size=batch_size,
         num_workers=2,
         transform_fn=transform_fn,
+        modalities=['t1', 't1ce', 't2', 'flair'],
         train_percent=0.8
     )
     
     model = MultiModalMultiTaskModel(
-    img_size=spatial_size,
-    in_channels=in_channels,
-    seg_classes=num_seg_classes,
-    cls_classes=num_cls_classes,
-    tabular_dim=10,
-    feature_size=48,
-    hidden_dim=128,
-    use_v2=True,
-    norm_name='batch'
+        img_size=spatial_size,
+        in_channels=in_channels,
+        seg_classes=num_seg_classes,
+        cls_classes=num_cls_classes,
+        tabular_dim=10,
+        feature_size=24,
+        hidden_dim=128,
+        use_v2=True,
+        norm_name='batch',
+        use_checkpoint=True
     )
     # ==== Loss ====
+    loss_seg = DiceLoss(
+        to_onehot_y=True,
+        softmax=True,
+        include_background=True,
+        jaccard=True
+    )
+    loss_cls = CrossEntropyLoss()
+
     loss_fn = MultiTaskLoss(
-        loss_seg= DiceLoss(to_onehot_y=True, softmax=True, jaccard=True, include_background=False),
-        loss_cls=CrossEntropyLoss(),
-        loss_weight=1.0
+        loss_seg=loss_seg,
+        loss_cls=loss_cls,
+        loss_weight=0.5
     )
     # Load pretrained segmentation weights
-    seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_batch3/checkpoints/best_model-epoch=07-val_dice=0.8961.ckpt"
+    seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch2_diceloss/checkpoints/best_model-epoch=46-val_dice=0.8828.ckpt"
     lit_model = LitMultiTaskModule(
         model=model,
         loss_fn=loss_fn,
         lr=1e-4,
         num_seg_classes=num_seg_classes,
         include_background=False,
-        seg_ckpt_path=seg_ckpt_path      
+        seg_ckpt_path=seg_ckpt_path,
+        out_path=out_path      
     )
 
     # === Logger + Checkpoint ===
@@ -146,15 +163,29 @@ def train():
         filename="epoch={epoch}-valdice={val_dice:.4f}"
     )
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
-
+    # early_stop_callback = EarlyStopping(
+    # monitor="val_dice",          # monitor metric
+    # patience=15,                 # số epoch không cải thiện trước khi dừng
+    # mode="max",                  # vì dice càng cao càng tốt
+    # verbose=True,                # log ra console
+    # min_delta=0.001              # ngưỡng cải thiện tối thiểu
+    # )
+    
+    # === Time ===
+    timer = Timer()
+    
     # === Trainer ===
     trainer = Trainer(
         accelerator=accelerator,
         devices=devices,
         strategy=strategy,
-        max_epochs=100,
+        max_epochs=200,
         logger=logger,
-        callbacks=[checkpoint, lr_monitor],
+        callbacks=[checkpoint, 
+                   lr_monitor,
+                   timer,
+                #    early_stop_callback, 
+                ],
         log_every_n_steps=5,
         check_val_every_n_epoch=1,
         deterministic=True,
@@ -163,6 +194,16 @@ def train():
     )
 
     trainer.fit(lit_model, datamodule=data_module)
+    print('---------- Training Time summary ----------')
+    duration_sec = timer.time_elapsed("train")
+
+    # Chuyển sang h:m:s
+    h = int(duration_sec // 3600)
+    m = int((duration_sec % 3600) // 60)
+    s = int(duration_sec % 60)
+
+    print(f"Tổng thời gian training: {h} giờ {m} phút {s} giây")
+
 
 if __name__ == "__main__":
     train()

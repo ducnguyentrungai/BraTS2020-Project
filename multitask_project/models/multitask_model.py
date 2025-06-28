@@ -58,18 +58,20 @@ class MultiModalMultiTaskModel(nn.Module):
                  feature_size: int,
                  hidden_dim: int,
                  norm_name: tuple | str = 'instance',
-                 use_v2: bool = False
+                 use_v2: bool = False,
+                  use_checkpoint: bool=True
                  ) -> None:
         super().__init__()
 
         # Backbone for segmentation
         self.backbone = SwinUNETR(
-            # img_size=img_size,
+            img_size=img_size,
             in_channels=in_channels,
             out_channels=seg_classes,
             feature_size=feature_size,
             norm_name=norm_name,
             use_v2=use_v2,
+            use_checkpoint=use_checkpoint
         )
 
         # Pool encoder feature

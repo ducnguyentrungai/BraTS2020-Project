@@ -5,7 +5,7 @@ from monai.transforms import (
     RandGaussianSmoothd, RandShiftIntensityd, RandScaleIntensityd,
     RandAdjustContrastd, Rand3DElasticd, Zoomd, CenterSpatialCropd,
     ToTensord, Resized, Lambdad, ThresholdIntensityd, CastToTyped, ResizeWithPadOrCropd, 
-    MapTransform, DeleteItemsd
+    MapTransform, DeleteItemsd,ConcatItemsd
 )
 from typing import Union, Sequence, Dict, Optional
 import numpy as np
@@ -30,7 +30,7 @@ def zscore_clip(img):
             std = img[mask].std()
             img[mask] = (img[mask] - mean) / (std + 1e-8)
             img[mask] = np.clip(img[mask], -5, 5)
-        return img
+        return torch.tensor(img)  # CHUYỂN VỀ torch.Tensor
     else:
         raise TypeError(f"Unsupported input type: {type(img)}")
 
@@ -106,8 +106,8 @@ def get_multitask_transforms(
         EnsureChannelFirstd(keys=["image", "label"]),
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
-        ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
-        Lambdad(keys=["image"], func=zscore_clip),
+        # ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
+        Lambdad(keys="image", func=zscore_clip),
         Lambdad(keys="label", func=remap_label),
         CropForegroundd(keys=["image", "label"], source_key="image", return_coords=False),
     ]
@@ -155,8 +155,13 @@ def get_multitask_transforms(
 
     transforms += [
         DeleteItemsd(keys=["foreground_start_coord", "foreground_end_coord"]),
-        ResizeWithPadOrCropd(keys="image", spatial_size=spatial_size),
-        ResizeWithPadOrCropd(keys="label", spatial_size=spatial_size),
+        # Resized(
+        #     keys=["image", "label"],
+        #     spatial_size=spatial_size,
+        #     mode=("trilinear", "nearest"),  # image: trilinear, label: nearest
+        # ),
+        
+        ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
         CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
         ToTensord(keys=["image", "label"]),
     ]
