@@ -61,12 +61,74 @@ class TabularToTensor(MapTransform):
         d["label_class"] = torch.tensor(d["label_class"], dtype=torch.long)
         return d
 
-def create_data_dicts_from_bratsid(root_dir: str,
-                                   table_path: str,
-                                   modalities: List[str],
-                                   train_percent: float = 0.8, 
-                                   shuffle: bool = True
-                                   ) -> Tuple[List[dict], List[dict]]:
+# def create_data_dicts_from_bratsid(root_dir: str,
+#                                    table_path: str,
+#                                    modalities: List[str],
+#                                    train_percent: float = 0.8, 
+#                                    shuffle: bool = True
+#                                    ) -> Tuple[List[dict], List[dict]]:
+#     tab_data = pd.read_csv(table_path)
+#     tab_data.set_index("Brats20ID", inplace=True)
+
+#     data_dicts = []
+
+#     for brats_id in tab_data.index:
+#         matched_dirs = glob.glob(os.path.join(root_dir, f"*{brats_id}*"))
+#         if not matched_dirs:
+#             print(f"❌ Không tìm thấy thư mục cho {brats_id}")
+#             continue
+#         case_dir = matched_dirs[0]
+
+#         all_files = glob.glob(os.path.join(case_dir, "*.nii"))
+
+#         image_paths = []
+#         for mod in modalities:
+#             mod_matches = [
+#                 f for f in all_files
+#                 if os.path.basename(f).endswith(f"_{mod}.nii")
+#             ]
+#             if len(mod_matches) != 1:
+#                 print(f"❌ Không tìm thấy đúng 1 ảnh modality '{mod}' cho {brats_id}: {mod_matches}")
+#                 break
+#             image_paths.append(mod_matches[0])
+
+#         if len(image_paths) != len(modalities):
+#             continue
+
+#         seg_matches = [
+#             f for f in all_files
+#             if "seg" in os.path.basename(f).lower()
+#         ]
+#         if len(seg_matches) != 1:
+#             print(f"❌ Không tìm thấy đúng 1 file segmentation cho {brats_id}")
+#             continue
+#         label_path = seg_matches[0]
+
+#         row = tab_data.loc[brats_id]
+#         tabular_features = row.drop("Survival_Class_Binary").to_dict()
+#         survival_class = int(row["Survival_Class_Binary"])
+
+#         data_dicts.append({
+#             "image": image_paths,
+#             "label": label_path,
+#             "tabular": tabular_features,
+#             "label_class": survival_class
+#         })
+
+#     print(f"✅ Tạo được {len(data_dicts)} sample hợp lệ.")
+
+#     # Split train/test theo tỉ lệ
+#     train_data, test_data = train_test_split(data_dicts, train_size=train_percent, random_state=42, shuffle=shuffle)
+#     print(f"📊 Train: {len(train_data)} | Test: {len(test_data)}")
+#     return train_data, test_data
+
+def create_data_dicts_from_bratsid(
+    root_dir: str,
+    table_path: str,
+    modalities: List[str],
+    train_percent: float = 0.8, 
+    shuffle: bool = True
+) -> Tuple[List[dict], List[dict]]:
     tab_data = pd.read_csv(table_path)
     tab_data.set_index("Brats20ID", inplace=True)
 
@@ -105,8 +167,8 @@ def create_data_dicts_from_bratsid(root_dir: str,
         label_path = seg_matches[0]
 
         row = tab_data.loc[brats_id]
-        tabular_features = row.drop("Survival_Class").to_dict()
-        survival_class = int(row["Survival_Class"])
+        tabular_features = row.drop("Survival_Class_Binary").to_dict()
+        survival_class = int(row["Survival_Class_Binary"])
 
         data_dicts.append({
             "image": image_paths,
@@ -117,7 +179,30 @@ def create_data_dicts_from_bratsid(root_dir: str,
 
     print(f"✅ Tạo được {len(data_dicts)} sample hợp lệ.")
 
-    # Split train/test theo tỉ lệ
-    train_data, test_data = train_test_split(data_dicts, train_size=train_percent, random_state=42, shuffle=shuffle)
-    print(f"📊 Train: {len(train_data)} | Test: {len(test_data)}")
+    if len(data_dicts) == 0:
+        raise ValueError("Không có dữ liệu hợp lệ để split.")
+
+    # Lấy labels để stratify
+    labels = [d["label_class"] for d in data_dicts]
+
+    # Split train/test stratified
+    train_data, test_data = train_test_split(
+        data_dicts,
+        train_size=train_percent,
+        random_state=42,
+        shuffle=True,        
+        stratify=labels
+    )
+
+    # Thống kê phân bố class
+    def count_labels(data):
+        counts = {}
+        for d in data:
+            cls = d["label_class"]
+            counts[cls] = counts.get(cls,0) +1
+        return counts
+
+    print(f"📊 Train ({len(train_data)}): {count_labels(train_data)}")
+    print(f"📊 Test  ({len(test_data)}): {count_labels(test_data)}")
+
     return train_data, test_data

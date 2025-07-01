@@ -7,7 +7,6 @@ from lightning.lit_multitask_module import LitMultiTaskModule
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.callbacks import Timer
 
-
 import os
 import sys
 import torch
@@ -62,16 +61,14 @@ def auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55):
 def train():
     
     image_dir = '/work/cuc.buithi/brats_challenge/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData'
-    table_path = "/work/cuc.buithi/brats_challenge/code/multitask_project/data/suvivaldays_info.csv"
+    table_path = '/work/cuc.buithi/brats_challenge/code/multitask_project/data/suvivaldays_binary.csv'
 
-    batch_size = 3
+    batch_size = 1
     spatial_size = (128, 128, 128)
-    # spatial_size = (96, 96, 96)
-    # spatial_size = (112, 112, 112)
     num_seg_classes = 4
-    num_cls_classes = 3
+    num_cls_classes = 2
     in_channels = 4
-    root_dir = 'logs/logs_bat3_new_model'
+    root_dir = 'logs/logs_bat1_new_model'
     out_path = os.path.join(root_dir, 'images_predict')
     ckpt_dir = os.path.join(root_dir, 'checkpoints')
     logs_dir = os.path.join(root_dir, 'mul_logs')
@@ -140,7 +137,7 @@ def train():
     loss_fn = MultiTaskLoss(
         loss_seg=loss_seg,
         loss_cls=loss_cls,
-        loss_weight=0.5
+        loss_weight=0.4
     )
     # Load pretrained segmentation weights
     seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch2_diceloss/checkpoints/best_model-epoch=46-val_dice=0.8828.ckpt"
@@ -159,10 +156,10 @@ def train():
     checkpoint = ModelCheckpoint(
         dirpath=ckpt_dir,
         monitor="val_composite",
-        mode="max",
+        mode="min",
         save_top_k=1,
         save_last=True,
-        filename="epoch={epoch}-val_composite={val_dice:.4f}"
+        filename="{epoch}_max_val_composite={val_composite:.4f}"
     )
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
     # early_stop_callback = EarlyStopping(

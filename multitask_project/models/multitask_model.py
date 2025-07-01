@@ -89,7 +89,7 @@ class MultiModalMultiTaskModel(nn.Module):
         feature_size: int,
         tabular_dim: int,
         img_embedding_dim: int,
-        conv_channels: Sequence[int] = (256, 512), 
+        conv_channels: Sequence[int] = (384, 512), 
         norm_name: Union[tuple, str] = 'instance',
         use_v2: bool = False,
         use_checkpoint: bool = True,

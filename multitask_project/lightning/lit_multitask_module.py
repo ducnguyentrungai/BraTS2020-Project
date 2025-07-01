@@ -83,7 +83,7 @@ class LitMultiTaskModule(LightningModule):
         f1 = f1_score(y_true, y_pred, average="macro", zero_division=0)
 
         # Composite metric (bạn có thể điều chỉnh trọng số)
-        composite_score = (1 - dice) * 0.5 + (1 - f1) * 0.5
+        composite_score = (1 - dice) * 0.8 + (1 - f1) * 0.2
 
         # Log all metrics
         self.log("val_total_loss", losses["loss"], sync_dist=True)
@@ -136,7 +136,7 @@ class LitMultiTaskModule(LightningModule):
 
         # ==== Màu segmentation ====
         seg_cmap = colors.ListedColormap(["black", "red", "green", "blue"])
-        bounds = [0, 1, 2, 3, 4]
+        bounds = [0, 1, 2, 3]
         norm = colors.BoundaryNorm(bounds, seg_cmap.N)
 
         # ==== Vẽ ====
