@@ -85,12 +85,12 @@ class LitSegSwinUNETR(pl.LightningModule):
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
 
     def _visualize_prediction(self, batch, yhat, epoch):
-        image = batch["image"][1]     # Tensor [C, H, W, D]
-        label = batch["label"][1]     # Tensor [1, H, W, D] hoặc [H, W, D]
+        image = batch["image"][0]     # Tensor [C, H, W, D]
+        label = batch["label"][0]     # Tensor [1, H, W, D] hoặc [H, W, D]
         if label.ndim == 4 and label.shape[0] == 1:
             label = label.squeeze(0)
 
-        pred = yhat[1].argmax(dim=0)  # [H, W, D]
+        pred = yhat[0].argmax(dim=0)  # [H, W, D]
 
         mid = image.shape[-1] // 2
         img_stack = image[:, :, :, mid].cpu().numpy()  # shape: (4, H, W)
@@ -101,7 +101,7 @@ class LitSegSwinUNETR(pl.LightningModule):
 
         # ==== Màu segmentation ====
         seg_cmap = colors.ListedColormap(["black", "red", "green", "blue"])
-        bounds = [0, 1, 2, 3, 4]
+        bounds = [0, 1, 2, 3]
         norm = colors.BoundaryNorm(bounds, seg_cmap.N)
 
         # ==== Vẽ ====

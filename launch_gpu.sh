@@ -1,5 +1,3 @@
-conda deactivate#!/bin/bash
-
 srun --pty \
     --job-name=brats \
     --partition=dgx-small  \

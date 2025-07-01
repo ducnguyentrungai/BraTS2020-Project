@@ -60,17 +60,18 @@ def auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55):
             pass
 
 def train():
+    
     image_dir = '/work/cuc.buithi/brats_challenge/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData'
     table_path = "/work/cuc.buithi/brats_challenge/code/multitask_project/data/suvivaldays_info.csv"
 
-    batch_size = 4
+    batch_size = 3
     spatial_size = (128, 128, 128)
     # spatial_size = (96, 96, 96)
     # spatial_size = (112, 112, 112)
     num_seg_classes = 4
     num_cls_classes = 3
     in_channels = 4
-    root_dir = 'logs/logs_128_bat4'
+    root_dir = 'logs/logs_bat3_new_model'
     out_path = os.path.join(root_dir, 'images_predict')
     ckpt_dir = os.path.join(root_dir, 'checkpoints')
     logs_dir = os.path.join(root_dir, 'mul_logs')
@@ -119,13 +120,14 @@ def train():
         in_channels=in_channels,
         seg_classes=num_seg_classes,
         cls_classes=num_cls_classes,
+        feature_size=48,
         tabular_dim=10,
-        feature_size=24,
-        hidden_dim=128,
+        img_embedding_dim=128,
         use_v2=True,
         norm_name='batch',
         use_checkpoint=True
     )
+    
     # ==== Loss ====
     loss_seg = DiceLoss(
         to_onehot_y=True,
@@ -156,11 +158,11 @@ def train():
     logger = CSVLogger(save_dir=logs_dir, name="multitask")
     checkpoint = ModelCheckpoint(
         dirpath=ckpt_dir,
-        monitor="val_dice",
+        monitor="val_composite",
         mode="max",
         save_top_k=1,
         save_last=True,
-        filename="epoch={epoch}-valdice={val_dice:.4f}"
+        filename="epoch={epoch}-val_composite={val_dice:.4f}"
     )
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
     # early_stop_callback = EarlyStopping(
@@ -188,7 +190,7 @@ def train():
                 ],
         log_every_n_steps=5,
         check_val_every_n_epoch=1,
-        deterministic=True,
+        deterministic=False,
         precision="16-mixed",
         accumulate_grad_batches=8,
     )
@@ -206,4 +208,5 @@ def train():
 
 
 if __name__ == "__main__":
+    torch.use_deterministic_algorithms(False)
     train()

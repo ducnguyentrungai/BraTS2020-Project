@@ -59,10 +59,10 @@ class LitMultiTaskModule(LightningModule):
     def training_step(self, batch, batch_idx):
         losses, _, _, _, _ = self.shared_step(batch)
         self.log("train_loss", losses["loss"], prog_bar=True, sync_dist=True)
-        self.log("train_loss_seg", losses["loss_seg"], sync_dist=True)
-        self.log("train_loss_cls", losses["loss_cls"], sync_dist=True)
+        self.log("train_loss_seg", losses["loss_seg"], prog_bar=True, sync_dist=True)
+        self.log("train_loss_cls", losses["loss_cls"], prog_bar=True, sync_dist=True)
         return losses["loss"]
-    
+        
     def validation_step(self, batch, batch_idx):
         losses, seg_pred, seg_label, cls_pred, cls_label = self.shared_step(batch)
         if batch_idx == 0:
@@ -75,12 +75,18 @@ class LitMultiTaskModule(LightningModule):
         # Classification metrics
         y_true = cls_label.cpu().numpy()
         y_pred = cls_pred.argmax(dim=1).detach().cpu().numpy()
+        print(f"Ground truth: {y_true}")
+        print(f"Prediction: {y_pred}")
         acc = accuracy_score(y_true, y_pred)
         prec = precision_score(y_true, y_pred, average="macro", zero_division=0)
         rec = recall_score(y_true, y_pred, average="macro", zero_division=0)
         f1 = f1_score(y_true, y_pred, average="macro", zero_division=0)
 
-        self.log("val_loss", losses["loss"], prog_bar=True, sync_dist=True)
+        # Composite metric (bạn có thể điều chỉnh trọng số)
+        composite_score = (1 - dice) * 0.5 + (1 - f1) * 0.5
+
+        # Log all metrics
+        self.log("val_total_loss", losses["loss"], sync_dist=True)
         self.log("val_loss_seg", losses["loss_seg"], sync_dist=True)
         self.log("val_loss_cls", losses["loss_cls"], sync_dist=True)
         self.log("val_dice", dice, prog_bar=True, sync_dist=True)
@@ -88,7 +94,8 @@ class LitMultiTaskModule(LightningModule):
         self.log("val_cls_acc", acc, sync_dist=True)
         self.log("val_cls_prec", prec, sync_dist=True)
         self.log("val_cls_rec", rec, sync_dist=True)
-        self.log("val_cls_f1", f1, sync_dist=True)
+        self.log("val_cls_f1", f1, prog_bar=True, sync_dist=True)
+        self.log("val_composite", composite_score, prog_bar=True, sync_dist=True)
 
         return {
             "loss": losses["loss"],
@@ -97,7 +104,8 @@ class LitMultiTaskModule(LightningModule):
             "acc": acc,
             "prec": prec,
             "rec": rec,
-            "f1": f1
+            "f1": f1,
+            "composite": composite_score
         }
 
         
@@ -105,7 +113,7 @@ class LitMultiTaskModule(LightningModule):
         optimizer = self.optim_class(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         scheduler = {
             "scheduler": ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=10),
-            "monitor": "val_loss",
+            "monitor": "val_composite",
             "interval": "epoch",
             "frequency": 1
         }

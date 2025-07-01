@@ -56,8 +56,8 @@ class BratsDataModule(LightningDataModule):
 
         rank_zero_print(f"Train samples: {len(train_dicts)}, Val samples: {len(val_dicts)}")
 
-        # train_dicts = train_dicts[:8]
-        # val_dicts = val_dicts[:4]
+        train_dicts = train_dicts[:8]
+        val_dicts = val_dicts[:4]
 
         if dist.is_available() and dist.is_initialized():
             

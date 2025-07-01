@@ -1,69 +1,104 @@
 import torch
 import torch.nn as nn
+from typing import Dict, Sequence, Union
 from monai.networks.nets import SwinUNETR
-from collections.abc import Sequence
 
-
-class AttentionFusion(nn.Module):
-    def __init__(self, img_dim: int, tab_dim: int, hidden_dim: int = 128):
+class SpatialAttention(nn.Module):
+    def __init__(self, in_channels):
         super().__init__()
-        self.query_layer = nn.Linear(tab_dim, hidden_dim)
-        self.key_layer = nn.Linear(img_dim, hidden_dim)
-        self.value_layer = nn.Linear(img_dim, hidden_dim)
-        self.output_layer = nn.Linear(hidden_dim, hidden_dim)
+        self.conv = nn.Conv3d(in_channels, 1, kernel_size=1)
+    
+    def forward(self, x):
+        att = torch.sigmoid(self.conv(x))  # [B,1,D,H,W]
+        return x * att
 
-    def forward(self, img_feat, tab_feat):
-        query = self.query_layer(tab_feat).unsqueeze(1)        # (B, 1, H)
-        key = self.key_layer(img_feat).unsqueeze(1)            # (B, 1, H)
-        value = self.value_layer(img_feat).unsqueeze(1)        # (B, 1, H)
-
-        attn_scores = torch.bmm(query, key.transpose(1, 2)) / (query.size(-1) ** 0.5)  # (B, 1, 1)
-        attn_weights = torch.softmax(attn_scores, dim=-1) + 1e-6                      # (B, 1, 1)
-
-        fused = torch.bmm(attn_weights, value).squeeze(1)      # (B, H)
-        return self.output_layer(fused)                        # (B, H)
-
-
-class MultiHeadFusion(nn.Module):
-    def __init__(self, img_dim: int, tab_dim: int, fused_dim: int, num_heads: int = 4):
+class CrossModalityAttention(nn.Module):
+    """
+    A simpler dot-product attention over embeddings.
+    """
+    def __init__(self, img_dim, tab_dim):
         super().__init__()
-        self.query_proj = nn.Linear(tab_dim, fused_dim)
-        self.key_proj = nn.Linear(img_dim, fused_dim)
-        self.value_proj = nn.Linear(img_dim, fused_dim)
-
-        self.attn = nn.MultiheadAttention(embed_dim=fused_dim, num_heads=num_heads, batch_first=True)
-        self.out_proj = nn.Sequential(
-            nn.Linear(fused_dim, fused_dim),
-            nn.GELU()
-        )
-
+        self.query = nn.Linear(tab_dim, img_dim)
+        self.key = nn.Linear(img_dim, img_dim)
+        self.value = nn.Linear(img_dim, img_dim)
+        self.scale = torch.sqrt(torch.tensor(img_dim, dtype=torch.float32))
+        
     def forward(self, img_feat, tab_feat):
-        # img_feat: (B, C_img), tab_feat: (B, C_tab)
-        query = self.query_proj(tab_feat).unsqueeze(1)  # (B, 1, D)
-        key = self.key_proj(img_feat).unsqueeze(1)      # (B, 1, D)
-        value = self.value_proj(img_feat).unsqueeze(1)  # (B, 1, D)
+        """
+        img_feat: [B, img_dim]
+        tab_feat: [B, tab_dim]
+        """
+        q = self.query(tab_feat)  # [B, img_dim]
+        k = self.key(img_feat)    # [B, img_dim]
+        v = self.value(img_feat)  # [B, img_dim]
 
-        attn_output, _ = self.attn(query, key, value)   # (B, 1, D)
-        fused = self.out_proj(attn_output.squeeze(1))   # (B, D)
-        return fused
+        att_score = torch.sum(q * k, dim=-1, keepdim=True) / self.scale  # [B,1]
+        att_weight = torch.softmax(att_score, dim=1)  # [B,1]
+        output = att_weight * v  # [B, img_dim]
+        return output
 
+class ImprovedMLPHead(nn.Module):
+    def __init__(
+        self, 
+        in_channels: int, 
+        out_channels: int,
+        conv_channels: Sequence[int] = (256, 512),
+        norm_type: str = 'batch',
+        dropout: float = 0.2
+    ):
+        super().__init__()
+        layers = []
+        prev_c = in_channels
+        
+        # Use stride=2 only on first conv to avoid reducing spatial size too much
+        for i, c in enumerate(conv_channels):
+            stride = 2 if i == 0 else 1
+            layers.extend([
+                nn.Conv3d(prev_c, c, kernel_size=3, stride=stride, padding=1),
+                nn.BatchNorm3d(c) if norm_type == 'batch' else nn.InstanceNorm3d(c),
+                nn.ReLU(inplace=True),
+                nn.Dropout3d(dropout)
+            ])
+            prev_c = c
+        
+        self.convs = nn.Sequential(*layers)
+        self.attention = SpatialAttention(prev_c)
+        self.final_pool = nn.AdaptiveAvgPool3d(1)
+        self.flatten = nn.Flatten()
+        self.dropout = nn.Dropout(p=dropout)
+        self.fc = nn.Linear(prev_c, out_channels)
+        
+    def forward(self, x):
+        x = self.convs(x)
+        # Check if spatial size is too small:
+        if min(x.shape[2:]) < 1:
+            raise ValueError(f"Feature map too small after convs: {x.shape}")
+        x = self.attention(x)
+        x = self.final_pool(x)
+        x = self.flatten(x)
+        x = self.dropout(x)
+        return self.fc(x)
 
 class MultiModalMultiTaskModel(nn.Module):
-    def __init__(self,
-                 img_size: Sequence[int] | int,
-                 in_channels: int,
-                 seg_classes: int,
-                 cls_classes: int,
-                 tabular_dim: int,
-                 feature_size: int,
-                 hidden_dim: int,
-                 norm_name: tuple | str = 'instance',
-                 use_v2: bool = False,
-                  use_checkpoint: bool=True
-                 ) -> None:
+    def __init__(
+        self,
+        img_size: Union[Sequence[int], int],
+        in_channels: int,
+        seg_classes: int,
+        cls_classes: int,
+        feature_size: int,
+        tabular_dim: int,
+        img_embedding_dim: int,
+        conv_channels: Sequence[int] = (256, 512), 
+        norm_name: Union[tuple, str] = 'instance',
+        use_v2: bool = False,
+        use_checkpoint: bool = True,
+        verbose: bool = True
+    ):
         super().__init__()
+        self.verbose = verbose
 
-        # Backbone for segmentation
+        # Backbone SwinUNETR
         self.backbone = SwinUNETR(
             img_size=img_size,
             in_channels=in_channels,
@@ -74,92 +109,91 @@ class MultiModalMultiTaskModel(nn.Module):
             use_checkpoint=use_checkpoint
         )
 
-        # Pool encoder feature
-        self.global_pool = nn.AdaptiveAvgPool3d(1)
-
-        # 🧪 Tự động suy ra img_dim từ đầu ra của backbone
+        # Automatic Channel Detection
+        if isinstance(img_size, int):
+            dummy_size = (img_size,) * 3
+        else:
+            dummy_size = tuple(img_size)
         with torch.no_grad():
-            dummy_input = torch.zeros(1, in_channels, * img_size)
+            dummy_input = torch.zeros(1, in_channels, *dummy_size)
             encoder_out = self.backbone.swinViT(dummy_input)
-            x = encoder_out[-1]
-            dummy_feat = self.global_pool(x).view(1, -1)
-            img_dim = dummy_feat.shape[1]
+            enc_channels = [f.shape[1] for f in encoder_out]
+            if self.verbose:
+                print(f"Detected encoder output channels: {enc_channels}")
+                print(f"Encoder output shapes: {[f.shape for f in encoder_out]}")
+
+        # Handle embedding split to avoid dimension mismatch
+        num_scales = len(enc_channels)
+        base_dim = img_embedding_dim // num_scales
+        remainder = img_embedding_dim - base_dim * num_scales
+        split_dims = [base_dim] * num_scales
+        split_dims[0] += remainder
+
+        # Multi-scale Image Encoders
+        norm_type = "batch" if "batch" in str(norm_name).lower() else "instance"
+        self.img_encoders = nn.ModuleList([
+            ImprovedMLPHead(
+                in_channels=ch,
+                out_channels=dim,
+                conv_channels=conv_channels,
+                norm_type=norm_type,
+                dropout=0.2
+            )
+            for ch, dim in zip(enc_channels, split_dims)
+        ])
 
         # Tabular encoder
         self.tabular_encoder = nn.Sequential(
             nn.Linear(tabular_dim, 64),
-            nn.GELU(),
-            nn.LayerNorm(64),  # Không phụ thuộc batch size
+            nn.ReLU(),
+            nn.LayerNorm(64),
             nn.Linear(64, 64),
-            nn.GELU()
+            nn.ReLU()
         )
 
-        # Attention fusion
-        # self.fusion = AttentionFusion(img_dim=img_dim, 
-        #                               tab_dim=64, 
-        #                               hidden_dim=hidden_dim)
-        self.fusion = MultiHeadFusion(
-                        img_dim=img_dim,
-                        tab_dim=64,
-                        fused_dim=hidden_dim,
-                        num_heads=4  # bạn có thể chọn 2 hoặc 8 tùy kích thước
-                    )
-
+        # Cross-modality attention
+        self.cross_attn = CrossModalityAttention(
+            img_dim=img_embedding_dim,
+            tab_dim=64
+        )
 
         # Classification head
         self.cls_head = nn.Sequential(
-            nn.Linear(hidden_dim + 64, 128),
-            nn.GELU(),
+            nn.Linear(img_embedding_dim + 64, 128),
+            nn.ReLU(),
+            nn.LayerNorm(128),
             nn.Linear(128, 64),
-            nn.GELU(),
+            nn.ReLU(),
             nn.Linear(64, cls_classes)
         )
 
-    # def forward(self, image, tabular):
-    #     seg_out = self.backbone(image)  # (B, seg_classes, D, H, W)
-
-    #     encoder_out = self.backbone.swinViT(image)
-    #     x = encoder_out[-1]
-    #     img_feat = self.global_pool(x).view(x.size(0), -1)
-
-    #     tab_feat = self.tabular_encoder(tabular)
-    #     fused_feat = self.fusion(img_feat, tab_feat)
-    #     cls_input = torch.cat([fused_feat, tab_feat], dim=1)
-    #     cls_out = self.cls_head(cls_input)
-
-    #     return {
-    #         "seg": seg_out,
-    #         "cls": cls_out
-    #     }
-    
-    def forward(self, image, tabular):
-        # Segmentation output
-        seg_out = self.backbone(image)  # (B, seg_classes, D, H, W)
-
-        # Trích xuất đặc trưng ảnh từ ViT
+    def forward(self, image, tabular) -> Dict[str, torch.Tensor]:
+        seg_out = self.backbone(image)
         encoder_out = self.backbone.swinViT(image)
-        x = encoder_out[-1]  # lấy đầu ra cuối cùng
-        img_feat = self.global_pool(x).view(x.size(0), -1)  # (B, C_img)
 
-        # Tabular encoding
-        tab_feat = self.tabular_encoder(tabular)  # (B, 64)
+        img_feats = []
+        for feat, encoder in zip(encoder_out, self.img_encoders):
+            # Only apply adaptive pooling if spatial size > 4
+            if min(feat.shape[2:]) > 4:
+                pooled_feat = nn.functional.adaptive_avg_pool3d(feat, (4, 4, 4))
+            else:
+                pooled_feat = feat
+            img_feats.append(encoder(pooled_feat))
 
-        # Fusion giữa ảnh và bảng
-        fused_feat = self.fusion(img_feat, tab_feat)  # (B, hidden_dim)
+        img_feat = torch.cat(img_feats, dim=1)
+        tab_feat = self.tabular_encoder(tabular)
+        attn_feat = self.cross_attn(img_feat, tab_feat)
 
-        # Kết hợp fused với tab_feat để classification
-        cls_input = torch.cat([fused_feat, tab_feat], dim=1)  # (B, hidden_dim + 64)
-        cls_out = self.cls_head(cls_input)  # (B, num_classes)
+        fusion = torch.cat([attn_feat, tab_feat], dim=1)
+        cls_out = self.cls_head(fusion)
 
         return {
             "seg": seg_out,
             "cls": cls_out
         }
 
-
     def load_pretrained_segmentation(self, ckpt_path: str):
         state_dict = torch.load(ckpt_path, map_location="cpu")
-
         if "state_dict" in state_dict:
             state_dict = state_dict["state_dict"]
 
@@ -171,12 +205,12 @@ class MultiModalMultiTaskModel(nn.Module):
             elif k.startswith("backbone."):
                 new_k = k.replace("backbone.", "")
                 new_state_dict[new_k] = v
-            elif k.startswith("model.") and not any(sub in k for sub in ["tabular_encoder", "cls_head"]):
+            elif k.startswith("model.") and not any(sub in k for sub in ["tabular_encoder", "cls_head", "img_encoder"]):
                 new_k = k.replace("model.", "")
                 new_state_dict[new_k] = v
 
         missing, unexpected = self.backbone.load_state_dict(new_state_dict, strict=False)
-        print(f"✅ Loaded pretrained SwinUNETR from {ckpt_path}")
+        print(f"Loaded pretrained SwinUNETR from {ckpt_path}")
         if missing:
             print(f"⚠️ Missing keys: {missing}")
         if unexpected:

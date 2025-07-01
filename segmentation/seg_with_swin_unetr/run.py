@@ -77,13 +77,13 @@ def auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/BraTS2021'
-    batch_size = 3
+    batch_size = 2
     # batch_size = 1
     spatial_size = (128, 128, 128)
     # spatial_size = (96, 96, 96)
     num_classes = 4
     in_channels = 4
-    root_dir = "swin_unetr_batch3_1"
+    root_dir = "swin_unetr_batch3_2"
     ckpt_dir = os.path.join(root_dir, "checkpoints")
     log_dir = os.path.join(root_dir, "logs")
 
@@ -104,7 +104,7 @@ def train():
         data_dir=data_dir,
         spatial_size=spatial_size,
         batch_size=batch_size,
-        num_workers=0,
+        num_workers=2,
         train_percent=0.825,
         modalities=['t1', 't1ce', 't2', 'flair'],
         transform_fn=lambda is_train: get_transforms(spatial_size=spatial_size, is_train=is_train)
@@ -155,10 +155,11 @@ def train():
 
     # ==== Trainer ====
     trainer = Trainer(
-        max_epochs=300,
+        max_epochs=100,
         accelerator=accelerator,
         devices=devices,
         strategy=strategy,
+        # precision="32-true",
         precision="16-mixed",
         accumulate_grad_batches=4,
         callbacks=[checkpoint_cb, 
@@ -171,7 +172,8 @@ def train():
 
     # ==== Load weights từ checkpoint như pretrain ====
     # checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new/checkpoints/best_model-epoch=116-val_dice=0.8749.ckpt"
-    checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch4/checkpoints/best_model-epoch=09-val_dice=0.8846.ckpt"
+    # checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch4/checkpoints/best_model-epoch=09-val_dice=0.8846.ckpt"
+    checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_batch3_1/checkpoints/best_model-epoch=54-val_dice=0.8964.ckpt"
     state_dict = torch.load(checkpoint_path, map_location="cpu")["state_dict"]    
     
     # checkpoint_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/pretrained/ssl_pretrained_weights.pth"

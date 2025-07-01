@@ -125,32 +125,32 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
                 keys=["image", "label"],
                 label_key="label",
                 spatial_size=spatial_size,
-                pos=1,
+                pos=2,
                 neg=1,
-                num_samples=1,
+                num_samples=2,
                 image_key="image",
                 image_threshold=0
             ),
             RandFlipd(keys=["image", "label"], spatial_axis=[0], prob=0.5),
             RandFlipd(keys=["image", "label"], spatial_axis=[1], prob=0.5),
             RandFlipd(keys=["image", "label"], spatial_axis=[2], prob=0.5),
-            RandRotate90d(keys=["image", "label"], prob=0.5, max_k=3),
+            RandRotate90d(keys=["image", "label"], prob=0.8, max_k=3),
             RandAffined(
                 keys=["image", "label"],
                 mode=("bilinear", "nearest"),
                 prob=0.3,
                 spatial_size=spatial_size,
-                rotate_range=(0.1, 0.1, 0.1),
-                scale_range=(0.1, 0.1, 0.1),
-                translate_range=(10, 10, 10),
+                rotate_range=(0.15, 0.15, 0.15),
+                scale_range=(0.15, 0.15, 0.15),
+                translate_range=(15, 15, 15),
                 padding_mode="border"
             ),
             RandShiftIntensityd(keys=["image"], offsets=0.1, prob=0.5),
             RandScaleIntensityd(keys=["image"], factors=0.1, prob=0.5),
             RandAdjustContrastd(keys=["image"], prob=0.3, gamma=(0.7, 1.5)),
-            RandGaussianNoised(keys=["image"], prob=0.3, mean=0.0, std=0.1),
-            RandGaussianSmoothd(keys=["image"], prob=0.2, sigma_x=(1, 2)),
-            Rand3DElasticd(keys=["image", "label"], sigma_range=(5, 8), magnitude_range=(50, 100), prob=0.2),
+            RandGaussianNoised(keys=["image"], prob=0.4, mean=0.0, std=0.5),
+            RandGaussianSmoothd(keys=["image"], prob=0.3, sigma_x=(0.5, 1.5)),
+            Rand3DElasticd(keys=["image", "label"], sigma_range=(4, 6), magnitude_range=(40, 90), prob=0.3),
         ]
     else:
         transforms += [
@@ -159,11 +159,9 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
         ]
 
     transforms += [
-        ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
+        # ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
         DeleteItemsd(keys=["foreground_start_coord", "foreground_end_coord"]),
-        # Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
         ToTensord(keys=["image", "label"]),
-        # CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
     ]
 
     return Compose(transforms)
@@ -192,7 +190,6 @@ def get_transforms_full_volume(spatial_size: Union[Sequence[int], int] = (128, 1
         ]
 
     transforms += [
-        CastToTyped(keys=["label"], dtype=np.uint8),
         Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest")),
         ToTensord(keys=["image", "label"]),
     ]

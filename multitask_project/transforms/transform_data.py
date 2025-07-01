@@ -106,7 +106,7 @@ def get_multitask_transforms(
         EnsureChannelFirstd(keys=["image", "label"]),
         Orientationd(keys=["image", "label"], axcodes="RAS"),
         Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=("bilinear", "nearest")),
-        # ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
+        ThresholdIntensityd(keys=["image"], threshold=0.0, above=True, cval=0.0),
         Lambdad(keys="image", func=zscore_clip),
         Lambdad(keys="label", func=remap_label),
         CropForegroundd(keys=["image", "label"], source_key="image", return_coords=False),
@@ -161,14 +161,15 @@ def get_multitask_transforms(
         #     mode=("trilinear", "nearest"),  # image: trilinear, label: nearest
         # ),
         
-        ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
-        CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
+        # ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
+        # CastToTyped(keys=["image", "label"], dtype=(torch.float32, torch.long)),
         ToTensord(keys=["image", "label"]),
     ]
 
     if tabular_stats is not None:
         transforms += [
             TabularToTensor(keys=["tabular"], stats=tabular_stats),
+            ToTensord(keys=["tabular"]),
         ]
 
     return Compose(transforms)
