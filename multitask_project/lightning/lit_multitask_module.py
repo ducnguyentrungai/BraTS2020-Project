@@ -75,8 +75,12 @@ class LitMultiTaskModule(LightningModule):
         # Classification metrics
         y_true = cls_label.cpu().numpy()
         y_pred = cls_pred.argmax(dim=1).detach().cpu().numpy()
-        print(f"Ground truth: {y_true}")
-        print(f"Prediction: {y_pred}")
+        
+        self.print("\n===============================================")
+        self.print(f"GT Labels   : {y_true}")
+        self.print(f"Pred Labels : {y_pred}")
+        self.print("===============================================\n")
+        
         acc = accuracy_score(y_true, y_pred)
         prec = precision_score(y_true, y_pred, average="macro", zero_division=0)
         rec = recall_score(y_true, y_pred, average="macro", zero_division=0)
@@ -127,7 +131,7 @@ class LitMultiTaskModule(LightningModule):
 
         pred = yhat[0].argmax(dim=0)  # [H, W, D]
 
-        mid = image.shape[-1] // 2
+        mid = int(image.shape[-1] // 2)
         img_stack = image[:, :, :, mid].cpu().numpy()  # shape: (4, H, W)
         stacked_input = [img_stack[i] for i in range(4)]  # T1, T1ce, T2, FLAIR
 
@@ -136,7 +140,7 @@ class LitMultiTaskModule(LightningModule):
 
         # ==== Màu segmentation ====
         seg_cmap = colors.ListedColormap(["black", "red", "green", "blue"])
-        bounds = [0, 1, 2, 3]
+        bounds = [0, 1, 2, 3, 4]
         norm = colors.BoundaryNorm(bounds, seg_cmap.N)
 
         # ==== Vẽ ====

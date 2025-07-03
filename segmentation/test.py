@@ -21,10 +21,3 @@ if __name__ == "__main__":
         else:
             print(f"outputs[{i}] type: {type(o)}")
 
-    # Nếu outputs có ít nhất 4 phần tử
-    enc1, enc2, enc3, enc4, *_ = outputs
-
-    print("enc1 shape:", enc1.shape)
-    print("enc2 shape:", enc2.shape)
-    print("enc3 shape:", enc3.shape)
-    print("enc4 shape:", enc4.shape)

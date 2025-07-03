@@ -68,7 +68,7 @@ def train():
     num_seg_classes = 4
     num_cls_classes = 2
     in_channels = 4
-    root_dir = 'logs/logs_bat1_new_model'
+    root_dir = 'logs/logs_bat1_new_model_32'
     out_path = os.path.join(root_dir, 'images_predict')
     ckpt_dir = os.path.join(root_dir, 'checkpoints')
     logs_dir = os.path.join(root_dir, 'mul_logs')
@@ -140,14 +140,15 @@ def train():
         loss_weight=0.4
     )
     # Load pretrained segmentation weights
-    seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch2_diceloss/checkpoints/best_model-epoch=46-val_dice=0.8828.ckpt"
+    # seg_ckpt_path = "/work/cuc.buithi/brats_challenge/code/segmentation/seg_with_swin_unetr/swin_unetr_v2_new_batch2_diceloss/checkpoints/best_model-epoch=46-val_dice=0.8828.ckpt"
+    mul_ckpt_path = "/work/cuc.buithi/brats_challenge/code/multitask_project/logs/logs_bat1_new_model_32/checkpoints/epoch=45-best_val_composite=0.3588.ckpt"
     lit_model = LitMultiTaskModule(
         model=model,
         loss_fn=loss_fn,
         lr=1e-4,
         num_seg_classes=num_seg_classes,
         include_background=False,
-        seg_ckpt_path=seg_ckpt_path,
+        seg_ckpt_path=mul_ckpt_path,
         out_path=out_path      
     )
 
@@ -159,7 +160,7 @@ def train():
         mode="min",
         save_top_k=1,
         save_last=True,
-        filename="{epoch}_max_val_composite={val_composite:.4f}"
+        filename="{epoch}-best_{val_composite:.4f}"
     )
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
     # early_stop_callback = EarlyStopping(
@@ -188,11 +189,14 @@ def train():
         log_every_n_steps=5,
         check_val_every_n_epoch=1,
         deterministic=False,
-        precision="16-mixed",
+        # precision="16-mixed",
+        precision="32",
         accumulate_grad_batches=8,
     )
 
-    trainer.fit(lit_model, datamodule=data_module)
+    trainer.fit(lit_model, 
+                datamodule=data_module,
+                ckpt_path=mul_ckpt_path)
     print('---------- Training Time summary ----------')
     duration_sec = timer.time_elapsed("train")
 

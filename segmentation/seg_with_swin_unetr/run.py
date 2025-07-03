@@ -77,13 +77,13 @@ def auto_select_gpus(n=2, threshold_mem_mib=5000, threshold_util=55):
 def train():
     # ==== Config ====
     data_dir = '/work/cuc.buithi/brats_challenge/BraTS2021'
-    batch_size = 2
-    # batch_size = 1
+    # batch_size = 2
+    batch_size = 1
     spatial_size = (128, 128, 128)
     # spatial_size = (96, 96, 96)
     num_classes = 4
     in_channels = 4
-    root_dir = "swin_unetr_batch3_2"
+    root_dir = "swin_unetr_batch1_32"
     ckpt_dir = os.path.join(root_dir, "checkpoints")
     log_dir = os.path.join(root_dir, "logs")
 
@@ -159,8 +159,8 @@ def train():
         accelerator=accelerator,
         devices=devices,
         strategy=strategy,
-        # precision="32-true",
-        precision="16-mixed",
+        precision="32",
+        # precision="16-mixed",
         accumulate_grad_batches=4,
         callbacks=[checkpoint_cb, 
                 #    training_timer_cb,

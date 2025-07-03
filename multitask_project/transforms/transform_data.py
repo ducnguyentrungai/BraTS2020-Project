@@ -5,7 +5,7 @@ from monai.transforms import (
     RandGaussianSmoothd, RandShiftIntensityd, RandScaleIntensityd,
     RandAdjustContrastd, Rand3DElasticd, Zoomd, CenterSpatialCropd,
     ToTensord, Resized, Lambdad, ThresholdIntensityd, CastToTyped, ResizeWithPadOrCropd, 
-    MapTransform, DeleteItemsd,ConcatItemsd
+    MapTransform, DeleteItemsd,ConcatItemsd, RandBiasFieldd
 )
 from typing import Union, Sequence, Dict, Optional
 import numpy as np
@@ -30,7 +30,7 @@ def zscore_clip(img):
             std = img[mask].std()
             img[mask] = (img[mask] - mean) / (std + 1e-8)
             img[mask] = np.clip(img[mask], -5, 5)
-        return torch.tensor(img)  # CHUYỂN VỀ torch.Tensor
+        return torch.tensor(img)
     else:
         raise TypeError(f"Unsupported input type: {type(img)}")
 
@@ -145,6 +145,7 @@ def get_multitask_transforms(
             RandGaussianNoised(keys=["image"], prob=0.4, mean=0.0, std=0.5),
             RandGaussianSmoothd(keys=["image"], prob=0.3, sigma_x=(0.5, 1.5)),
             Rand3DElasticd(keys=["image", "label"], sigma_range=(4, 6), magnitude_range=(40, 90), prob=0.3),
+            RandBiasFieldd(keys=["image"], prob=0.3),
         ]
     else:
         transforms += [

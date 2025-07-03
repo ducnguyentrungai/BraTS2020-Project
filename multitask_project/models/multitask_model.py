@@ -79,6 +79,7 @@ class ImprovedMLPHead(nn.Module):
         x = self.dropout(x)
         return self.fc(x)
 
+
 class MultiModalMultiTaskModel(nn.Module):
     def __init__(
         self,
@@ -173,7 +174,7 @@ class MultiModalMultiTaskModel(nn.Module):
 
         img_feats = []
         for feat, encoder in zip(encoder_out, self.img_encoders):
-            # Only apply adaptive pooling if spatial size > 4
+            # Only apply adaptive pooling if spatial size > 4 thử thay bằng 8
             if min(feat.shape[2:]) > 4:
                 pooled_feat = nn.functional.adaptive_avg_pool3d(feat, (4, 4, 4))
             else:
