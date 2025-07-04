@@ -9,6 +9,7 @@ from monai.data import CacheDataset, list_data_collate, partition_dataset, Persi
 from monai.transforms import Compose
 from sklearn.model_selection import train_test_split
 import nibabel as nib
+
 def is_rank_zero():
     if dist.is_available() and dist.is_initialized():
         return dist.get_rank() == 0
@@ -19,25 +20,25 @@ def rank_zero_print(*args, **kwargs):
         print(*args, **kwargs)
 
 
-# def create_data_dicts(data_dirs: List[str], modalities: List[str]) -> List[dict]:
-#     """
-#     Tạo danh sách dict chuẩn MONAI: {'image': [...], 'label': ...}
-#     """
-#     data_dicts = []
-#     for case_dir in data_dirs:
-#         base = os.path.basename(case_dir)
-#         images = [os.path.join(case_dir, f"{base}_{mod}.nii.gz") for mod in modalities]
-#         label = os.path.join(case_dir, f"{base}_seg.nii.gz")
-#         if all(os.path.exists(p) for p in images) and os.path.exists(label):
-#             data_dicts.append({"image": images, "label": label})
-#     return data_dicts
+def create_data_dicts(data_dirs: List[str], modalities: List[str]) -> List[dict]:
+    """
+    Tạo danh sách dict chuẩn MONAI: {'image': [...], 'label': ...}
+    """
+    data_dicts = []
+    for case_dir in data_dirs:
+        base = os.path.basename(case_dir)
+        images = [os.path.join(case_dir, f"{base}_{mod}.nii.gz") for mod in modalities]
+        label = os.path.join(case_dir, f"{base}_seg.nii.gz")
+        if all(os.path.exists(p) for p in images) and os.path.exists(label):
+            data_dicts.append({"image": images, "label": label})
+    return data_dicts
 
 
 # def create_data_dicts(
 #     data_dirs: List[str],
 #     modalities: List[str],
 #     error_json_path: str = None,
-#     expected_dim: int = 3  # mỗi ảnh đơn modal phải có shape [H, W, D]
+#     expected_dim: int = 3,  # số chiều không gian kỳ vọng: thường là 3D (H, W, D)
 # ) -> List[dict]:
 #     data_dicts = []
 #     error_cases = []
@@ -71,7 +72,6 @@ def rank_zero_print(*args, **kwargs):
 #                         "error": str(e),
 #                         "path": img_path
 #                     })
-
 #             if bad_shapes:
 #                 case_error["bad_shapes"] = bad_shapes
 
@@ -79,9 +79,8 @@ def rank_zero_print(*args, **kwargs):
 #             error_cases.append(case_error)
 #         else:
 #             data_dicts.append({
-#                 "image": images,     # sẽ được LoadImaged + ConcatItemsd
+#                 "image": images,
 #                 "label": label,
-#                 # "case_id": base
 #             })
 
 #     if error_json_path and error_cases:
@@ -95,66 +94,6 @@ def rank_zero_print(*args, **kwargs):
 #     return data_dicts
 
 
-def create_data_dicts(
-    data_dirs: List[str],
-    modalities: List[str],
-    error_json_path: str = None,
-    expected_dim: int = 3,  # số chiều không gian kỳ vọng: thường là 3D (H, W, D)
-) -> List[dict]:
-    data_dicts = []
-    error_cases = []
-
-    for case_dir in data_dirs:
-        base = os.path.basename(case_dir)
-        images = [os.path.join(case_dir, f"{base}_{mod}.nii.gz") for mod in modalities]
-        label = os.path.join(case_dir, f"{base}_seg.nii.gz")
-
-        case_error = {"case_id": base}
-        missing = [p for p in images if not os.path.exists(p)]
-        if not os.path.exists(label):
-            missing.append(label)
-
-        if missing:
-            case_error["missing_files"] = missing
-        else:
-            bad_shapes = []
-            for i, img_path in enumerate(images):
-                try:
-                    img = nib.load(img_path)
-                    if len(img.shape) != expected_dim:
-                        bad_shapes.append({
-                            "modality": modalities[i],
-                            "shape": img.shape,
-                            "path": img_path
-                        })
-                except Exception as e:
-                    bad_shapes.append({
-                        "modality": modalities[i],
-                        "error": str(e),
-                        "path": img_path
-                    })
-            if bad_shapes:
-                case_error["bad_shapes"] = bad_shapes
-
-        if "missing_files" in case_error or "bad_shapes" in case_error:
-            error_cases.append(case_error)
-        else:
-            data_dicts.append({
-                "image": images,
-                "label": label,
-            })
-
-    if error_json_path and error_cases:
-        with open(error_json_path, "w") as f:
-            json.dump(error_cases, f, indent=2)
-        print(f"❌ Ghi {len(error_cases)} case lỗi vào: {error_json_path}")
-    else:
-        print("✅ Không có case lỗi.")
-
-    print(f"✅ Tổng số case hợp lệ: {len(data_dicts)} / {len(data_dirs)}")
-    return data_dicts
-
-
 
 def setup_case_splits(data_dir, modalities, train_percent=0.825, debug_limit=None):
     all_cases = sorted(glob.glob(os.path.join(data_dir, "BraTS2021_*")))
@@ -165,18 +104,24 @@ def setup_case_splits(data_dir, modalities, train_percent=0.825, debug_limit=Non
     )
     rank_zero_print(f"📂 Train: {len(train_cases)} | Val: {len(val_cases)}")
 
+    # train_dicts = create_data_dicts(
+    #     train_cases, modalities, error_json_path="train_missing.json"
+    # )
+    # val_dicts = create_data_dicts(
+    #     val_cases, modalities, error_json_path="val_missing.json"
+    # )
     train_dicts = create_data_dicts(
-        train_cases, modalities, error_json_path="train_missing.json"
+        train_cases, modalities
     )
     val_dicts = create_data_dicts(
-        val_cases, modalities, error_json_path="val_missing.json"
+        val_cases, modalities
     )
 
     # Nếu cần debug nhanh
     if debug_limit:
         train_dicts = train_dicts[:debug_limit]
         val_dicts = val_dicts[:debug_limit // 2]
-        rank_zero_print(f"🧪 Debug mode: train={len(train_dicts)}, val={len(val_dicts)}")
+        rank_zero_print(f"Debug mode: train={len(train_dicts)}, val={len(val_dicts)}")
 
     return train_dicts, val_dicts
 
@@ -204,6 +149,10 @@ class BratsDataModule(LightningDataModule):
     def setup(self, stage: Optional[str] = None):    
         train_dicts, val_dicts =  setup_case_splits(self.data_dir, modalities=self.modalities, train_percent=self.train_percent)
 
+        # train_dicts = train_dicts[:8]
+        # val_dicts = val_dicts[1:5]
+        # rank_zero_print(train_dicts[0])
+        
         # Chia dữ liệu giữa các GPU nếu dùng DDP
         if dist.is_available() and dist.is_initialized():
             rank = dist.get_rank()
@@ -219,52 +168,49 @@ class BratsDataModule(LightningDataModule):
         if stage in ("fit", None):
         
             ## === Load data with CacheDataset === 
-            self.train_dataset = CacheDataset(
-                data=train_dicts,
-                transform=self.transform_fn(is_train=True),
-                cache_rate=1.0,
-                # cache_rate=0.1,
-                num_workers=self.num_workers,
-            )
-            self.val_dataset = CacheDataset(
-                data=val_dicts,
-                transform=self.transform_fn(is_train=False),
-                cache_rate=1.0,
-                num_workers=self.num_workers,
-            )
-            
-            # # === Load data with SmartCacheDataset ===
-            # self.train_dataset = SmartCacheDataset(
+            # self.train_dataset = CacheDataset(
             #     data=train_dicts,
             #     transform=self.transform_fn(is_train=True),
-            #     cache_num=80,         # số lượng sample cache ban đầu, bạn có thể điều chỉnh
-            #     replace_rate=0.3,      # tỷ lệ sample được thay thế mỗi epoch
-            #     num_init_workers = self.num_workers
+            #     cache_rate=1.0,
+            #     num_workers=self.num_workers,
             # )
-            
-            # self.val_dataset = SmartCacheDataset(
+            # self.val_dataset = CacheDataset(
             #     data=val_dicts,
             #     transform=self.transform_fn(is_train=False),
-            #     cache_num= len(val_dicts),       
-            #     replace_rate=1.0,
-            #     num_init_workers = self.num_workers
+            #     cache_rate=1.0,
+            #     num_workers=self.num_workers,
             # )
-
-        elif stage in ("test", "predict"):
-            self.val_dataset = CacheDataset(
-                data=val_dicts,
-                transform=self.transform_fn(is_train=False),
-                cache_rate=1.0,
-                num_workers=self.num_workers,
+            
+            # === Load data with SmartCacheDataset ===
+            self.train_dataset = SmartCacheDataset(
+                data=train_dicts,
+                transform=self.transform_fn(is_train=True),
+                cache_num=200,         # số lượng sample cache ban đầu, bạn có thể điều chỉnh
+                replace_rate=0.2,      # tỷ lệ sample được thay thế mỗi epoch
+                num_init_workers = self.num_workers
             )
             
-            # self.val_dataset = SmartCacheDataset(
+            self.val_dataset = SmartCacheDataset(
+                data=val_dicts,
+                transform=self.transform_fn(is_train=False),
+                cache_num= len(val_dicts),       
+                num_init_workers = self.num_workers
+            )
+
+        elif stage in ("test", "predict"):
+            # self.val_dataset = CacheDataset(
             #     data=val_dicts,
-            #     transform=self.transform_fn(is_train=True),
-            #     cache_num= len(val_dicts),         # số lượng sample cache ban đầu, bạn có thể điều chỉnh
-            #     replace_rate=1.0,      # tỷ lệ sample được thay thế mỗi epoch
-            #     num_init_workers = self.num_workers
+            #     transform=self.transform_fn(is_train=False),
+            #     cache_rate=1.0,
+            #     num_workers=self.num_workers,
             # )
+            
+            self.val_dataset = SmartCacheDataset(
+                data=val_dicts,
+                transform=self.transform_fn(is_train=False),
+                cache_num= len(val_dicts),          # số lượng sample cache ban đầu, bạn có thể điều chỉnh
+                num_init_workers = self.num_workers
+            )
 
     def train_dataloader(self):
         return DataLoader(
@@ -274,7 +220,8 @@ class BratsDataModule(LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=True,
             drop_last=True,
-            collate_fn=pad_list_data_collate,
+            # collate_fn=pad_list_data_collate,
+            collate_fn=list_data_collate,
         )
 
 
@@ -286,7 +233,8 @@ class BratsDataModule(LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=True,
             drop_last=False,
-            collate_fn=pad_list_data_collate,
+            # collate_fn=pad_list_data_collate,
+            collate_fn=list_data_collate,
         )
     
     def val_dataloader(self):

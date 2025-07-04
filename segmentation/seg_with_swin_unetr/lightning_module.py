@@ -84,32 +84,96 @@ class LitSegSwinUNETR(pl.LightningModule):
         }
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
 
+    # def _visualize_prediction(self, batch, yhat, epoch):
+    #     image = batch["image"][0]     # Tensor [C, H, W, D]
+    #     label = batch["label"][0]     # Tensor [1, H, W, D] hoặc [H, W, D]
+    #     if label.ndim == 4 and label.shape[0] == 1:
+    #         label = label.squeeze(0)
+
+    #     pred = yhat[0].argmax(dim=0)  # [H, W, D]
+
+    #     mid = int(image.shape[-1] // 2)
+    #     img_stack = image[:, :, :, mid].cpu().numpy()  # shape: (4, H, W)
+    #     stacked_input = [img_stack[i] for i in range(4)]  # T1, T1ce, T2, FLAIR
+
+    #     gt = label[:, :, mid].cpu().numpy()
+    #     pr = pred[:, :, mid].cpu().numpy()
+
+    #     # ==== Màu segmentation ====
+    #     seg_cmap = colors.ListedColormap(["black", "red", "green", "blue"])
+    #     bounds = [0, 1, 2, 3, 4]
+    #     norm = colors.BoundaryNorm(bounds, seg_cmap.N)
+
+    #     # ==== Vẽ ====
+    #     fig, axs = plt.subplots(1, 6, figsize=(18, 4))
+    #     titles = ["T1", "T1ce", "T2", "FLAIR", "GT", "Prediction"]
+
+    #     for i in range(4):
+    #         axs[i].imshow(stacked_input[i], cmap="gray")
+    #         axs[i].set_title(titles[i])
+    #         axs[i].axis("off")
+
+    #     axs[4].imshow(gt, cmap=seg_cmap, norm=norm)
+    #     axs[4].set_title("GT")
+    #     axs[4].axis("off")
+
+    #     axs[5].imshow(pr, cmap=seg_cmap, norm=norm)
+    #     axs[5].set_title("Prediction")
+    #     axs[5].axis("off")
+
+    #     # Lưu ảnh
+    #     save_dir = os.path.join(self.out_path, "images", f"epoch_{epoch}")
+    #     os.makedirs(save_dir, exist_ok=True)
+    #     plt.tight_layout()
+    #     plt.savefig(os.path.join(save_dir, "combined.png"), bbox_inches="tight")
+    #     plt.close()
+
     def _visualize_prediction(self, batch, yhat, epoch):
-        image = batch["image"][0]     # Tensor [C, H, W, D]
-        label = batch["label"][0]     # Tensor [1, H, W, D] hoặc [H, W, D]
+        """
+        Visualize prediction vs ground truth on a mid slice of the 3D volume.
+        Assumes input images are normalized to [-5, 5].
+        """
+        # ========== Chọn ảnh trong batch ==========
+        idx = 0  # Bạn có thể đổi thành random index nếu muốn
+        image = batch["image"][idx]     # Tensor [C, H, W, D]
+        label = batch["label"][idx]     # Tensor [1, H, W, D] hoặc [H, W, D]
+
+        # ========== Squeeze label nếu cần ==========
         if label.ndim == 4 and label.shape[0] == 1:
             label = label.squeeze(0)
+        elif label.ndim != 3:
+            raise ValueError(f"Unexpected label shape: {label.shape}")
 
-        pred = yhat[0].argmax(dim=0)  # [H, W, D]
+        # ========== Argmax prediction ==========
+        if yhat.ndim == 5:
+            pred = yhat[idx].argmax(dim=0)  # [H, W, D]
+        elif yhat.ndim == 4:
+            pred = yhat[idx]                # Nếu model trả về trực tiếp nhãn
+        else:
+            raise ValueError(f"Unexpected yhat shape: {yhat.shape}")
 
-        mid = image.shape[-1] // 2
+        # ========== Chọn lát cắt giữa ==========
+        mid = int(image.shape[-1] // 2)
         img_stack = image[:, :, :, mid].cpu().numpy()  # shape: (4, H, W)
         stacked_input = [img_stack[i] for i in range(4)]  # T1, T1ce, T2, FLAIR
 
         gt = label[:, :, mid].cpu().numpy()
         pr = pred[:, :, mid].cpu().numpy()
 
-        # ==== Màu segmentation ====
+        # ========== Màu segmentation ==========
         seg_cmap = colors.ListedColormap(["black", "red", "green", "blue"])
-        bounds = [0, 1, 2, 3]
+        bounds = [0, 1, 2, 3, 4]
         norm = colors.BoundaryNorm(bounds, seg_cmap.N)
 
-        # ==== Vẽ ====
+        # ========== Vẽ ==========
         fig, axs = plt.subplots(1, 6, figsize=(18, 4))
         titles = ["T1", "T1ce", "T2", "FLAIR", "GT", "Prediction"]
 
         for i in range(4):
-            axs[i].imshow(stacked_input[i], cmap="gray")
+            img = stacked_input[i]
+            # Scale min-max về [0,1] để hiển thị đẹp
+            img_norm = (img - img.min()) / (img.max() - img.min() + 1e-8)
+            axs[i].imshow(img_norm, cmap="gray")
             axs[i].set_title(titles[i])
             axs[i].axis("off")
 
@@ -121,10 +185,17 @@ class LitSegSwinUNETR(pl.LightningModule):
         axs[5].set_title("Prediction")
         axs[5].axis("off")
 
-        # Lưu ảnh
+        # ========== Lưu ảnh ==========
         save_dir = os.path.join(self.out_path, "images", f"epoch_{epoch}")
         os.makedirs(save_dir, exist_ok=True)
         plt.tight_layout()
         plt.savefig(os.path.join(save_dir, "combined.png"), bbox_inches="tight")
         plt.close()
+
+        # ========== Debug ==========
+        print("=== Visualize Debug Info ===")
+        print("yhat shape:", yhat.shape)
+        print("label shape:", label.shape)
+        print("Unique labels GT:", np.unique(gt))
+        print("Unique labels Pred:", np.unique(pr))
 

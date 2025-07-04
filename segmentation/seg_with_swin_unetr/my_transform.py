@@ -55,7 +55,6 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
         Lambdad(keys="label", func=remap_label),  # ✅ remap nhãn
         CropForegroundd(keys=["image", "label"], source_key="image", return_coords=False)
     ]
-
     if is_train:
         transforms += [
             SpatialPadd(keys=["image", "label"], spatial_size=spatial_size),
@@ -95,9 +94,10 @@ def get_transforms(spatial_size: Union[Sequence[int], int] = (128, 128, 128), is
         ]
 
     transforms += [
+        # ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
         DeleteItemsd(keys=["foreground_start_coord", "foreground_end_coord"]),
         ToTensord(keys=["image", "label"]),
-        # Resized(keys=["image", "label"], spatial_size=spatial_size, mode=("trilinear", "nearest"))
+        
         
     ]
 
